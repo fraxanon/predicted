@@ -1,0 +1,176 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-feature-settings: "cv11", "ss01";
+    font-variation-settings: "opsz" 32;
+  }
+  
+  body {
+    @apply antialiased bg-black-950 text-white;
+  }
+  
+  * {
+    @apply border-black-800;
+  }
+}
+
+@layer components {
+  /* Buttons - Black theme with minimal orange accents */
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium transition-all duration-200 focus:outline-none disabled:opacity-50 disabled:pointer-events-none;
+  }
+  
+  .btn-primary {
+    @apply btn bg-white text-black-950 hover:bg-black-100 border border-white;
+  }
+  
+  .btn-secondary {
+    @apply btn bg-black-800 text-white hover:bg-black-700 border border-black-700;
+  }
+  
+  .btn-accent {
+    @apply btn bg-accent-500 text-white hover:bg-accent-600 border border-accent-500;
+  }
+  
+  .btn-ghost {
+    @apply btn bg-transparent text-white hover:bg-black-800 border border-black-700;
+  }
+  
+  /* Cards - Black theme */
+  .card {
+    @apply bg-black-900 border border-black-800 p-6;
+  }
+  
+  .card-hover {
+    @apply card transition-all duration-300 hover:border-black-700 hover:bg-black-800/50;
+  }
+  
+  /* Inputs - Black theme */
+  .input {
+    @apply block w-full bg-black-900 border-black-700 text-white placeholder-black-400 focus:border-white focus:ring-1 focus:ring-white sm:text-sm;
+  }
+  
+  /* Badges - Black theme */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 text-xs font-medium;
+  }
+  
+  .badge-primary {
+    @apply badge bg-white text-black-950;
+  }
+  
+  .badge-secondary {
+    @apply badge bg-black-800 text-white border border-black-700;
+  }
+  
+  .badge-accent {
+    @apply badge bg-accent-500/20 text-accent-400 border border-accent-500/30;
+  }
+  
+  /* Logo - Typewriter style */
+  .logo {
+    @apply font-typewriter text-white tracking-wider;
+  }
+  
+  .logo-accent {
+    @apply text-accent-500;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-white to-black-200 bg-clip-text text-transparent;
+  }
+  
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  .glass {
+    @apply bg-black-900/50 backdrop-blur-md border border-black-700;
+  }
+  
+  .gradient-bg {
+    background: linear-gradient(135deg, #18181b 0%, #27272a 100%);
+  }
+  
+  .web3-gradient {
+    background: linear-gradient(135deg, #18181b 0%, #27272a 50%, #f97316 100%);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-black-900;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-black-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-black-500;
+}
+
+/* Loading animations */
+.loading-dots {
+  display: inline-block;
+}
+
+.loading-dots::after {
+  content: '';
+  animation: loading-dots 1.5s infinite;
+}
+
+@keyframes loading-dots {
+  0%, 20% { content: ''; }
+  40% { content: '.'; }
+  60% { content: '..'; }
+  80%, 100% { content: '...'; }
+}
+
+/* Market card hover effects */
+.market-card {
+  @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+}
+
+/* Prediction confidence bar */
+.confidence-bar {
+  @apply relative h-2 bg-black-800 overflow-hidden;
+}
+
+.confidence-fill {
+  @apply absolute top-0 left-0 h-full bg-gradient-to-r from-white to-accent-500 transition-all duration-500;
+}
+
+/* Betting button states */
+.bet-button-yes {
+  @apply bg-gradient-to-r from-white to-black-200 hover:from-black-100 hover:to-black-300 text-black-950;
+}
+
+.bet-button-no {
+  @apply bg-gradient-to-r from-black-800 to-black-700 hover:from-black-700 hover:to-black-600 text-white border border-black-600;
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  .card {
+    @apply p-4;
+  }
+  
+  .btn {
+    @apply px-3 py-1.5 text-xs;
+  }
+}
