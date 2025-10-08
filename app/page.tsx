@@ -109,7 +109,6 @@ function DashboardSection() {
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard title="Active Markets" value="12" />
-        <StatCard title="Total Volume" value="$45.2K" />
         <StatCard title="AI Accuracy" value="78.5%" />
         <StatCard title="Your Bets" value="3" />
       </div>
@@ -118,7 +117,7 @@ function DashboardSection() {
       <div className="card">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl font-semibold text-white">Latest Markets</h3>
-          <button className="btn-ghost text-sm">View All</button>
+          <a href="/markets" className="btn-ghost text-sm no-underline">View All</a>
         </div>
         
         <div className="space-y-4">
@@ -203,8 +202,18 @@ function MarketPreview({
           </div>
         </div>
         <div className="flex gap-2">
-          <button className="btn-secondary text-xs px-3 py-1">View</button>
-          <button className="btn-primary text-xs px-3 py-1">Bet</button>
+          <a 
+            href={`/market/market-1`}
+            className="btn-secondary text-xs px-3 py-1 no-underline"
+          >
+            View
+          </a>
+          <a 
+            href={`/market/market-1`}
+            className="btn-primary text-xs px-3 py-1 no-underline"
+          >
+            Bet
+          </a>
         </div>
       </div>
     </div>
