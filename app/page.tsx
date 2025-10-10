@@ -3,6 +3,7 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 import { Badge } from '../components/ui/Badge';
+import { AIAnalytics } from '../components/AIAnalytics';
 import { useState } from 'react';
 
 // Web3-focused market data
@@ -284,6 +285,11 @@ function DashboardPage() {
       </nav>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* AI Analytics Dashboard */}
+        <div className="mb-6">
+          <AIAnalytics showDashboard={true} />
+        </div>
+
         {/* Mobile Search */}
         <div className="md:hidden mb-4">
           <div className="relative">
@@ -365,6 +371,12 @@ function FeatureCard({ title, description, label }: {
 }
 
 function MarketCard({ market }: { market: any }) {
+  // Mock AI prediction for demo (in production, this would come from the analytics agent)
+  const aiPrediction = {
+    prediction: market.chance > 50 ? 'yes' : 'no',
+    confidence: Math.min(0.95, Math.max(0.65, (market.chance > 50 ? market.chance : 100 - market.chance) / 100))
+  };
+
   return (
     <a 
       href={`/market/${market.id}`}
@@ -389,10 +401,29 @@ function MarketCard({ market }: { market: any }) {
           {market.title}
         </h3>
 
+        {/* AI Prediction */}
+        <div className="mb-3">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs text-black-400">AI Prediction</span>
+            <div className="flex items-center space-x-2">
+              <span className={`text-xs px-2 py-1 font-bold ${
+                aiPrediction.prediction === 'yes' 
+                  ? 'bg-green-900 text-green-400' 
+                  : 'bg-red-900 text-red-400'
+              }`}>
+                {aiPrediction.prediction.toUpperCase()}
+              </span>
+              <span className="text-xs text-accent-500">
+                {(aiPrediction.confidence * 100).toFixed(0)}%
+              </span>
+            </div>
+          </div>
+        </div>
+
         {/* Chance Indicator */}
         <div className="mb-4">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs text-black-400">Chance</span>
+            <span className="text-xs text-black-400">Market Chance</span>
             <span className="text-sm font-bold text-white">{market.chance}%</span>
           </div>
           <div className="h-1 bg-black-800 overflow-hidden">

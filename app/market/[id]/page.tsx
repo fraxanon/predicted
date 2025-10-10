@@ -1,14 +1,14 @@
 'use client';
 
 import { useParams } from 'next/navigation';
+import { useState } from 'react';
 import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { useState } from 'react';
+import { AIAnalytics } from '../../../components/AIAnalytics';
 import { Button } from '../../../components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '../../../components/ui/Card';
 import { Badge } from '../../../components/ui/Badge';
 import { Logo } from '../../../components/ui/Logo';
-
 // Mock market data - in real app this would come from API/blockchain
 const MOCK_MARKETS = {
   'market-1': {
@@ -165,6 +165,9 @@ export default function MarketDetailPage() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Advanced AI Analytics */}
+            <AIAnalytics marketId={market.id} showDashboard={false} />
 
             {/* Resolution Criteria */}
             <Card>
