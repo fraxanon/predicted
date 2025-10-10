@@ -93,12 +93,123 @@ const FILTERS = [
 
 export default function HomePage() {
   const { isConnected } = useAccount();
+
+  return (
+    <div className="min-h-screen bg-black-950">
+      {!isConnected ? (
+        <LandingPage />
+      ) : (
+        <DashboardPage />
+      )}
+    </div>
+  );
+}
+
+function LandingPage() {
+  return (
+    <>
+      {/* Header */}
+      <header className="border-b border-black-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* Logo */}
+            <div className="flex items-center">
+              <span className="text-white font-bold text-lg font-typewriter">[Predicted]</span>
+            </div>
+
+            {/* Connect Wallet */}
+            <div className="flex items-center space-x-4">
+              <ConnectButton 
+                chainStatus="icon"
+                accountStatus={{
+                  smallScreen: 'avatar',
+                  largeScreen: 'full',
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="text-center">
+          <h1 className="text-2xl sm:text-3xl font-semibold text-white mb-4">
+            AI-Powered Web3 Prediction Markets
+          </h1>
+        
+          <p className="text-lg sm:text-xl text-black-300 mb-12 max-w-2xl mx-auto">
+            Bet on Web3 news and events with AI-powered insights. 
+            Our multi-agent system analyzes markets in real-time.
+          </p>
+
+          {/* CTA */}
+          <div className="mb-16">
+            <p className="text-black-400 mb-6">Connect your wallet to start predicting</p>
+            <div className="flex justify-center">
+              <ConnectButton />
+            </div>
+          </div>
+
+          {/* Features */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-16">
+            <FeatureCard
+              title="ORACLE"
+              description="Real-time Web3 news validation and analysis"
+              label="INTEL"
+            />
+            <FeatureCard
+              title="MARKET"
+              description="Autonomous prediction market deployment"
+              label="DEPLOY"
+            />
+            <FeatureCard
+              title="BETTING"
+              description="Instant payment processing and settlement"
+              label="TRADE"
+            />
+            <FeatureCard
+              title="ANALYTICS"
+              description="AI-powered outcome prediction engine"
+              label="PREDICT"
+            />
+          </div>
+
+          {/* Sample Markets Preview */}
+          <div className="mt-16">
+            <h3 className="text-xl font-semibold text-white mb-8">Featured Markets</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {TRENDING_MARKETS.slice(0, 3).map((market) => (
+                <div key={market.id} className="bg-black-900 border border-black-800 p-4 opacity-75">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs px-2 py-1 bg-black-800 text-black-300 border border-black-700">
+                      {market.category}
+                    </span>
+                    <span className="text-xs text-black-500">{market.endDate}</span>
+                  </div>
+                  <h4 className="text-white font-medium mb-3 text-sm">{market.title}</h4>
+                  <div className="text-center">
+                    <span className="text-accent-500 font-bold">{market.chance}%</span>
+                    <p className="text-xs text-black-400 mt-1">AI Prediction</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="text-black-400 text-sm mt-6">Connect wallet to place bets and view all markets</p>
+          </div>
+        </div>
+      </main>
+    </>
+  );
+}
+
+function DashboardPage() {
   const [selectedCategory, setSelectedCategory] = useState('Trending');
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
-    <div className="min-h-screen bg-black-950">
+    <>
       {/* Header */}
       <header className="border-b border-black-800 bg-black-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -233,6 +344,23 @@ export default function HomePage() {
           </button>
         </div>
       </main>
+    </>
+  );
+}
+
+function FeatureCard({ title, description, label }: {
+  title: string;
+  description: string;
+  label: string;
+}) {
+  return (
+    <div className="text-left p-6 border-l-2 border-accent-500 bg-black-900 border border-black-800">
+      <div className="flex items-center justify-between mb-4">
+        <span className="text-xs font-mono px-2 py-1 bg-accent-500 text-black-950">{label}</span>
+        <div className="w-2 h-2 bg-accent-500"></div>
+      </div>
+      <h3 className="text-lg font-bold text-white mb-2 font-mono tracking-wide">{title}</h3>
+      <p className="text-sm text-black-400 leading-relaxed">{description}</p>
     </div>
   );
 }

@@ -6,12 +6,10 @@ import { Providers } from './providers';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'IQ Predict - Web3 News Prediction Market',
-  description: 'AI-powered prediction markets for Web3 news and events',
-  keywords: 'web3, prediction market, ai, blockchain, fraxtal, iq',
-  authors: [{ name: 'IQ Predict Team' }],
-  viewport: 'width=device-width, initial-scale=1',
-  themeColor: '#0ea5e9',
+  title: 'Predicted',
+  description: 'AI-powered Web3 prediction markets',
+  keywords: 'web3, prediction market, ai, blockchain, fraxtal, predicted',
+  authors: [{ name: 'Predicted Team' }],
   manifest: '/manifest.json',
   icons: {
     icon: '/favicon.ico',
