@@ -5,12 +5,12 @@ import { useAccount } from 'wagmi';
 import { Badge } from '../components/ui/Badge';
 import { useState } from 'react';
 
-// Mock market data similar to Polymarket
+// Web3-focused market data
 const TRENDING_MARKETS = [
   {
     id: 'market-1',
     title: 'Will Coinbase launch a new Layer 2 by Q4 2024?',
-    category: 'Crypto',
+    category: 'L2',
     endDate: 'December 31',
     yesPrice: 72,
     noPrice: 28,
@@ -21,74 +21,74 @@ const TRENDING_MARKETS = [
   },
   {
     id: 'market-2', 
-    title: 'Major DeFi protocol announces token airdrop?',
-    category: 'Airdrop',
+    title: 'Will Ethereum upgrade to Proof of Stake 2.0?',
+    category: 'ETH',
     endDate: 'November 15',
-    yesPrice: 45,
-    noPrice: 55,
-    volume: '$8.3k',
-    change: '-2%',
+    yesPrice: 85,
+    noPrice: 15,
+    volume: '$45.3k',
+    change: '+12%',
     trending: true,
-    chance: 45
+    chance: 85
   },
   {
     id: 'market-3',
-    title: 'Ethereum gas fees drop below 10 gwei average?',
-    category: 'DeFi',
-    endDate: 'October 30',
-    yesPrice: 63,
-    noPrice: 37,
-    volume: '$5.7k',
+    title: 'Bitcoin reaches $100K by end of 2024?',
+    category: 'BTC',
+    endDate: 'December 31',
+    yesPrice: 43,
+    noPrice: 57,
+    volume: '$89.7k',
     change: '+8%',
-    trending: false,
-    chance: 63
+    trending: true,
+    chance: 43
   },
   {
     id: 'market-4',
-    title: 'Will Tesla (TSLA) beat quarterly earnings?',
-    category: 'Earnings',
-    endDate: 'October 15',
-    yesPrice: 77,
-    noPrice: 23,
-    volume: '$238k',
-    change: '+12%',
+    title: 'Major DeFi protocol announces $1B+ airdrop?',
+    category: 'DeFi',
+    endDate: 'October 30',
+    yesPrice: 67,
+    noPrice: 33,
+    volume: '$23.1k',
+    change: '-3%',
     trending: false,
-    chance: 77
+    chance: 67
   },
   {
     id: 'market-5',
-    title: 'Nobel Peace Prize Winner 2025',
-    category: 'World',
-    endDate: 'October 10',
-    yesPrice: 27,
-    noPrice: 73,
-    volume: '$683k',
-    change: '-5%',
+    title: 'Solana network experiences major outage?',
+    category: 'SOL',
+    endDate: 'November 30',
+    yesPrice: 34,
+    noPrice: 66,
+    volume: '$15.8k',
+    change: '+15%',
     trending: false,
-    chance: 27
+    chance: 34
   },
   {
     id: 'market-6',
-    title: 'Will Trump pardon Ghislaine Maxwell?',
-    category: 'Politics',
-    endDate: 'January 20',
-    yesPrice: 18,
-    noPrice: 82,
-    volume: '$73k',
-    change: '+3%',
+    title: 'New Web3 gaming token launches on Fraxtal?',
+    category: 'Gaming',
+    endDate: 'December 15',
+    yesPrice: 58,
+    noPrice: 42,
+    volume: '$7.2k',
+    change: '+22%',
     trending: false,
-    chance: 18
+    chance: 58
   }
 ];
 
 const CATEGORIES = [
-  'Trending', 'Breaking', 'New', 'Politics', 'Sports', 'Crypto', 
-  'Earnings', 'Geopolitics', 'Tech', 'Culture', 'World', 'Economy'
+  'Trending', 'Breaking', 'New', 'DeFi', 'L2', 'BTC', 'ETH', 
+  'Gaming', 'NFTs', 'DAOs', 'Airdrops', 'Governance'
 ];
 
 const FILTERS = [
-  'All', 'Gov Shutdown', 'Gaza', 'NYC Mayor', 'Taylor Swift', 'France', 
-  'MLB Playoffs', 'Venezuela', 'Israel', 'Fed', 'Earnings'
+  'All', 'Bitcoin', 'Ethereum', 'Solana', 'Polygon', 'Arbitrum', 
+  'Optimism', 'Fraxtal', 'Uniswap', 'Aave', 'Compound', 'OpenSea'
 ];
 
 export default function HomePage() {

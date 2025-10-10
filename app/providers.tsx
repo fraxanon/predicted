@@ -1,43 +1,46 @@
 'use client';
 
 import { WagmiConfig, createConfig, configureChains } from 'wagmi';
-import { fraxtal } from 'wagmi/chains';
+import { mainnet, polygon, arbitrum, optimism } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
-import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
+import { alchemyProvider } from 'wagmi/providers/alchemy';
 import { RainbowKitProvider, getDefaultWallets } from '@rainbow-me/rainbowkit';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '@rainbow-me/rainbowkit/styles.css';
 
-// Configure Fraxtal chain
-const fraxtalChain = {
-  ...fraxtal,
-  rpcUrls: {
-    default: {
-      http: [process.env.NEXT_PUBLIC_FRAXTAL_RPC_URL || 'https://rpc.frax.com'],
-    },
-    public: {
-      http: [process.env.NEXT_PUBLIC_FRAXTAL_RPC_URL || 'https://rpc.frax.com'],
-    },
+// Define Fraxtal chain manually
+const fraxtal = {
+  id: 252,
+  name: 'Fraxtal',
+  network: 'fraxtal',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'Frax Ether',
+    symbol: 'frxETH',
   },
+  rpcUrls: {
+    public: { http: ['https://rpc.frax.com'] },
+    default: { http: ['https://rpc.frax.com'] },
+  },
+  blockExplorers: {
+    default: { name: 'FraxScan', url: 'https://fraxscan.com' },
+  },
+  testnet: false,
 };
 
 // Configure chains and providers
 const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [fraxtalChain],
+  [mainnet, polygon, arbitrum, optimism, fraxtal],
   [
-    jsonRpcProvider({
-      rpc: (chain) => ({
-        http: chain.rpcUrls.default.http[0],
-      }),
-    }),
+    alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_ALCHEMY_ID || 'demo' }),
     publicProvider(),
   ]
 );
 
 // Configure wallets
 const { connectors } = getDefaultWallets({
-  appName: 'IQ Predict',
-  projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || 'default-project-id',
+  appName: '[Predicted] - Web3 Prediction Markets',
+  projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || '2f5a2b1c8d3e4f5a6b7c8d9e0f1a2b3c',
   chains,
 });
 
@@ -70,58 +73,58 @@ export function Providers({ children }: { children: React.ReactNode }) {
               modalOverlay: 'small',
             },
             colors: {
-              accentColor: '#0ea5e9',
-              accentColorForeground: 'white',
+              accentColor: '#f97316',
+              accentColorForeground: '#09090b',
               actionButtonBorder: 'rgba(255, 255, 255, 0.04)',
               actionButtonBorderMobile: 'rgba(255, 255, 255, 0.08)',
               actionButtonSecondaryBackground: 'rgba(255, 255, 255, 0.08)',
-              closeButton: 'rgba(224, 232, 255, 0.6)',
+              closeButton: 'rgba(255, 255, 255, 0.6)',
               closeButtonBackground: 'rgba(255, 255, 255, 0.08)',
-              connectButtonBackground: '#0ea5e9',
+              connectButtonBackground: '#f97316',
               connectButtonBackgroundError: '#ef4444',
-              connectButtonInnerBackground: 'linear-gradient(0deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.15))',
-              connectButtonText: 'white',
+              connectButtonInnerBackground: 'linear-gradient(0deg, rgba(249, 115, 22, 0.075), rgba(249, 115, 22, 0.15))',
+              connectButtonText: '#09090b',
               connectButtonTextError: 'white',
-              connectionIndicator: '#22c55e',
-              downloadBottomCardBackground: 'linear-gradient(126deg, rgba(255, 255, 255, 0) 9.49%, rgba(171, 171, 171, 0.04) 71.04%), #1a1b1f',
-              downloadTopCardBackground: 'linear-gradient(126deg, rgba(171, 171, 171, 0.2) 9.49%, rgba(255, 255, 255, 0) 71.04%), #1a1b1f',
+              connectionIndicator: '#f97316',
+              downloadBottomCardBackground: 'linear-gradient(126deg, rgba(255, 255, 255, 0) 9.49%, rgba(171, 171, 171, 0.04) 71.04%), #18181b',
+              downloadTopCardBackground: 'linear-gradient(126deg, rgba(171, 171, 171, 0.2) 9.49%, rgba(255, 255, 255, 0) 71.04%), #18181b',
               error: '#ef4444',
               generalBorder: 'rgba(255, 255, 255, 0.08)',
               generalBorderDim: 'rgba(255, 255, 255, 0.04)',
-              menuItemBackground: 'rgba(224, 232, 255, 0.1)',
-              modalBackdrop: 'rgba(0, 0, 0, 0.5)',
-              modalBackground: 'white',
+              menuItemBackground: 'rgba(255, 255, 255, 0.1)',
+              modalBackdrop: 'rgba(0, 0, 0, 0.8)',
+              modalBackground: '#18181b',
               modalBorder: 'rgba(255, 255, 255, 0.08)',
-              modalText: '#1f2937',
-              modalTextDim: '#6b7280',
-              modalTextSecondary: '#9ca3af',
-              profileAction: 'rgba(224, 232, 255, 0.1)',
-              profileActionHover: 'rgba(224, 232, 255, 0.2)',
-              profileForeground: 'rgba(224, 232, 255, 0.05)',
-              selectedOptionBorder: 'rgba(224, 232, 255, 0.1)',
+              modalText: '#ffffff',
+              modalTextDim: '#a1a1aa',
+              modalTextSecondary: '#71717a',
+              profileAction: 'rgba(255, 255, 255, 0.1)',
+              profileActionHover: 'rgba(255, 255, 255, 0.2)',
+              profileForeground: 'rgba(255, 255, 255, 0.05)',
+              selectedOptionBorder: 'rgba(249, 115, 22, 0.3)',
               standby: '#fbbf24',
             },
             fonts: {
               body: 'Inter, system-ui, sans-serif',
             },
             radii: {
-              actionButton: '12px',
-              connectButton: '12px',
-              menuButton: '12px',
-              modal: '16px',
-              modalMobile: '16px',
+              actionButton: '0px',
+              connectButton: '0px',
+              menuButton: '0px',
+              modal: '0px',
+              modalMobile: '0px',
             },
             shadows: {
-              connectButton: '0px 4px 12px rgba(0, 0, 0, 0.1)',
-              dialog: '0px 8px 32px rgba(0, 0, 0, 0.32)',
-              profileDetailsAction: '0px 2px 6px rgba(37, 41, 46, 0.04)',
-              selectedOption: '0px 2px 6px rgba(0, 0, 0, 0.24)',
-              selectedWallet: '0px 2px 6px rgba(0, 0, 0, 0.12)',
-              walletLogo: '0px 2px 16px rgba(0, 0, 0, 0.16)',
+              connectButton: '0px 4px 12px rgba(0, 0, 0, 0.3)',
+              dialog: '0px 8px 32px rgba(0, 0, 0, 0.5)',
+              profileDetailsAction: '0px 2px 6px rgba(0, 0, 0, 0.1)',
+              selectedOption: '0px 2px 6px rgba(0, 0, 0, 0.3)',
+              selectedWallet: '0px 2px 6px rgba(0, 0, 0, 0.2)',
+              walletLogo: '0px 2px 16px rgba(0, 0, 0, 0.2)',
             },
           }}
           modalSize="compact"
-          initialChain={fraxtalChain}
+          initialChain={mainnet}
         >
           {children}
         </RainbowKitProvider>
