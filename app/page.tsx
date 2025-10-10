@@ -255,45 +255,32 @@ function DashboardPage() {
               </div>
               
               {/* Search */}
-              <div className="hidden md:flex relative">
+              <div className="hidden lg:flex relative">
                 <input
                   type="text"
                   placeholder="Search predicted"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-80 bg-black-800 border border-black-700 text-white placeholder-black-400 px-4 py-2 text-sm focus:outline-none focus:border-accent-500 transition-colors"
+                  className="w-64 bg-black-800 border border-black-700 text-white placeholder-black-400 px-4 py-2 text-sm focus:outline-none focus:border-accent-500 transition-colors"
                 />
                 <span className="absolute right-3 top-2.5 text-black-400 text-xs">/</span>
               </div>
               
-              <div className="hidden md:flex items-center space-x-6">
-                <a 
-                  href="/portfolio" 
-                  className="text-black-400 hover:text-white transition-colors text-sm font-medium"
-                >
-                  Portfolio
-                </a>
-                <div className="flex items-center space-x-1 text-accent-500 cursor-pointer">
-                  <span className="text-sm">💡</span>
-                  <span className="text-white text-sm font-medium">How it works</span>
-                </div>
-              </div>
             </div>
             
             <div className="flex items-center space-x-4">
               <a 
                 href="/portfolio"
-                className="text-right hidden sm:block"
+                className="text-right"
               >
                 <div className="text-white text-sm font-medium">Portfolio</div>
                 <div className="text-accent-500 text-xs">$0.00</div>
               </a>
               <button 
                 onClick={() => setShowSettings(true)}
-                className="text-white hover:text-accent-500 transition-colors text-sm font-medium flex items-center space-x-1"
+                className="text-white hover:text-accent-500 transition-colors p-2"
               >
                 <span>⚙️</span>
-                <span className="hidden sm:inline">Settings</span>
               </button>
               <ConnectButton 
                 chainStatus="icon"
