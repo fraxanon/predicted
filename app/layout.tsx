@@ -12,8 +12,9 @@ export const metadata: Metadata = {
   authors: [{ name: 'Predicted Team' }],
   manifest: '/manifest.json',
   icons: {
-    icon: '/favicon.ico',
-    apple: '/apple-touch-icon.png',
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
   },
 };
 
