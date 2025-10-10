@@ -6,8 +6,9 @@ import { Badge } from '../components/ui/Badge';
 import { AIAnalytics } from '../components/AIAnalytics';
 import { InterestOnboarding } from '../components/InterestOnboarding';
 import { ProfileSettings } from '../components/ProfileSettings';
+import { IndividualBetting } from '../components/IndividualBetting';
 import { useUserProfile } from '../hooks/useUserProfile';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 // Web3-focused market data
 const TRENDING_MARKETS = [
@@ -229,6 +230,14 @@ function DashboardPage() {
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [showSettings, setShowSettings] = useState(false);
+  const [investedMarkets, setInvestedMarkets] = useState<Set<string>>(new Set());
+  const { recommendations } = useUserProfile();
+
+  // Track markets that the AI agent has invested in
+  useEffect(() => {
+    const invested = new Set(recommendations.map(rec => rec.marketId));
+    setInvestedMarkets(invested);
+  }, [recommendations]);
 
   return (
     <>
@@ -362,9 +371,27 @@ function DashboardPage() {
 
         {/* Markets Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {TRENDING_MARKETS.map((market) => (
-            <MarketCard key={market.id} market={market} />
-          ))}
+          {TRENDING_MARKETS.map((market) => {
+            const isInvested = investedMarkets.has(market.id);
+            const investedRec = recommendations.find(rec => rec.marketId === market.id);
+            
+            return (
+              <IndividualBetting 
+                key={market.id} 
+                market={{
+                  ...market,
+                  aiPrediction: market.chance > 50 ? 'yes' : 'no',
+                  confidence: Math.min(0.95, Math.max(0.65, market.chance / 100)),
+                  isInvested,
+                  investedAmount: investedRec ? Math.round(investedRec.potentialReturn * 100) : undefined
+                }}
+                onBetPlaced={(result) => {
+                  console.log('Individual bet placed:', result);
+                  // Handle bet result (show success message, update UI, etc.)
+                }}
+              />
+            );
+          })}
         </div>
 
         {/* Load More */}

@@ -329,21 +329,42 @@ export function InterestOnboarding({ onComplete }: InterestOnboardingProps) {
 
               {/* Investment Amount */}
               <div>
-                <h3 className="text-white font-medium mb-4">Potential Investment Amount (USDC)</h3>
-                <div className="max-w-md">
-                  <input
-                    type="range"
-                    min="50"
-                    max="10000"
-                    step="50"
-                    value={investmentAmount}
-                    onChange={(e) => setInvestmentAmount(Number(e.target.value))}
-                    className="w-full h-2 bg-black-800 appearance-none cursor-pointer"
-                  />
-                  <div className="flex justify-between text-sm text-black-400 mt-2">
-                    <span>$50</span>
-                    <span className="text-white font-bold">${investmentAmount}</span>
-                    <span>$10,000</span>
+                <h3 className="text-white font-medium mb-4">Investment Budget (USDC)</h3>
+                <div className="max-w-md space-y-4">
+                  <div className="flex items-center space-x-4">
+                    <span className="text-black-400 text-sm">$</span>
+                    <input
+                      type="number"
+                      min="100"
+                      max="100000"
+                      step="100"
+                      value={investmentAmount}
+                      onChange={(e) => setInvestmentAmount(Math.max(100, Math.min(100000, Number(e.target.value))))}
+                      className="flex-1 bg-black-800 border border-black-700 text-white px-4 py-3 text-lg font-bold focus:outline-none focus:border-accent-500 transition-colors"
+                      placeholder="5000"
+                    />
+                    <span className="text-black-400 text-sm">USDC</span>
+                  </div>
+                  
+                  {/* Quick Amount Buttons */}
+                  <div className="flex flex-wrap gap-2">
+                    {[500, 1000, 2500, 5000, 10000, 25000].map((amount) => (
+                      <button
+                        key={amount}
+                        onClick={() => setInvestmentAmount(amount)}
+                        className={`px-3 py-1 text-sm border transition-colors ${
+                          investmentAmount === amount
+                            ? 'bg-accent-500 text-black-950 border-accent-500'
+                            : 'bg-transparent text-black-300 border-black-700 hover:border-black-600'
+                        }`}
+                      >
+                        ${amount.toLocaleString()}
+                      </button>
+                    ))}
+                  </div>
+                  
+                  <div className="text-xs text-black-500">
+                    Range: $100 - $100,000 USDC
                   </div>
                 </div>
               </div>
