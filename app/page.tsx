@@ -4,6 +4,8 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 import { Badge } from '../components/ui/Badge';
 import { AIAnalytics } from '../components/AIAnalytics';
+import { InterestOnboarding } from '../components/InterestOnboarding';
+import { useUserProfile } from '../hooks/useUserProfile';
 import { useState } from 'react';
 
 // Web3-focused market data
@@ -94,15 +96,54 @@ const FILTERS = [
 
 export default function HomePage() {
   const { isConnected } = useAccount();
+  const { hasCompletedOnboarding, saveProfile } = useUserProfile();
+
+  const handleOnboardingComplete = (profile: any) => {
+    saveProfile(profile);
+  };
 
   return (
     <div className="min-h-screen bg-black-950">
       {!isConnected ? (
         <LandingPage />
+      ) : !hasCompletedOnboarding ? (
+        <OnboardingPage onComplete={handleOnboardingComplete} />
       ) : (
         <DashboardPage />
       )}
     </div>
+  );
+}
+
+function OnboardingPage({ onComplete }: { onComplete: (profile: any) => void }) {
+  return (
+    <>
+      {/* Simple Header */}
+      <header className="border-b border-black-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-white flex items-center justify-center">
+                <span className="text-black-950 font-bold text-sm">[P]</span>
+              </div>
+              <span className="text-xs bg-accent-500 text-black-950 px-1 py-0.5 font-bold">🇺🇸</span>
+            </div>
+            <ConnectButton 
+              chainStatus="icon"
+              accountStatus={{
+                smallScreen: 'avatar',
+                largeScreen: 'full',
+              }}
+            />
+          </div>
+        </div>
+      </header>
+
+      {/* Onboarding Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <InterestOnboarding onComplete={onComplete} />
+      </main>
+    </>
   );
 }
 
