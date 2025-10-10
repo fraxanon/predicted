@@ -5,6 +5,7 @@ import { useAccount } from 'wagmi';
 import { Badge } from '../components/ui/Badge';
 import { AIAnalytics } from '../components/AIAnalytics';
 import { InterestOnboarding } from '../components/InterestOnboarding';
+import { ProfileSettings } from '../components/ProfileSettings';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { useState } from 'react';
 
@@ -217,28 +218,6 @@ function LandingPage() {
             />
           </div>
 
-          {/* Sample Markets Preview */}
-          <div className="mt-16">
-            <h3 className="text-xl font-semibold text-white mb-8">Featured Markets</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {TRENDING_MARKETS.slice(0, 3).map((market) => (
-                <div key={market.id} className="bg-black-900 border border-black-800 p-4 opacity-75">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs px-2 py-1 bg-black-800 text-black-300 border border-black-700">
-                      {market.category}
-                    </span>
-                    <span className="text-xs text-black-500">{market.endDate}</span>
-                  </div>
-                  <h4 className="text-white font-medium mb-3 text-sm">{market.title}</h4>
-                  <div className="text-center">
-                    <span className="text-accent-500 font-bold">{market.chance}%</span>
-                    <p className="text-xs text-black-400 mt-1">AI Prediction</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <p className="text-black-400 text-sm mt-6">Connect wallet to place bets and view all markets</p>
-          </div>
         </div>
       </main>
     </>
@@ -249,6 +228,7 @@ function DashboardPage() {
   const [selectedCategory, setSelectedCategory] = useState('Trending');
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showSettings, setShowSettings] = useState(false);
 
   return (
     <>
@@ -284,8 +264,12 @@ function DashboardPage() {
             </div>
             
             <div className="flex items-center space-x-4">
-              <button className="text-white hover:text-accent-500 transition-colors text-sm font-medium">
-                Log in
+              <button 
+                onClick={() => setShowSettings(true)}
+                className="text-white hover:text-accent-500 transition-colors text-sm font-medium flex items-center space-x-1"
+              >
+                <span>⚙️</span>
+                <span className="hidden sm:inline">Settings</span>
               </button>
               <ConnectButton 
                 chainStatus="icon"
@@ -390,6 +374,11 @@ function DashboardPage() {
           </button>
         </div>
       </main>
+
+      {/* Profile Settings Modal */}
+      {showSettings && (
+        <ProfileSettings onClose={() => setShowSettings(false)} />
+      )}
     </>
   );
 }
