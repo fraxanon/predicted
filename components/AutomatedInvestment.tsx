@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { useUserProfile } from '../hooks/useUserProfile';
+import { X402Client, MockX402Client, X402Utils, PaymentRequest } from '../lib/x402-client';
 
 interface InvestmentRecommendation {
   marketId: string;
@@ -168,24 +169,81 @@ export function AutomatedInvestment({ totalBudget, onInvestmentComplete }: Autom
   };
 
   const processX402Payment = async (investment: InvestmentRecommendation) => {
-    // Mock x402 integration - replace with actual x402 API calls
-    const mockTransaction = {
-      marketId: investment.marketId,
-      amount: investment.recommendedAmount,
-      prediction: investment.aiPrediction,
-      txHash: `0x${Math.random().toString(16).substr(2, 64)}`,
-      timestamp: new Date().toISOString(),
-      success: Math.random() > 0.1, // 90% success rate for demo
+    // Initialize x402 client (use mock for development, real for production)
+    const x402Client = process.env.NODE_ENV === 'production' 
+      ? new X402Client({
+          apiKey: process.env.NEXT_PUBLIC_COINBASE_X402_API_KEY || '',
+          apiSecret: process.env.COINBASE_X402_SECRET || '',
+          environment: 'production'
+        })
+      : new MockX402Client();
+
+    // Create payment request
+    const paymentRequest: PaymentRequest = {
+      amount: X402Utils.formatUSDCAmount(investment.recommendedAmount),
+      currency: 'USDC',
+      recipient: X402Utils.generateMarketAddress(investment.marketId),
+      metadata: {
+        marketId: investment.marketId,
+        prediction: investment.aiPrediction,
+        userId: address || 'unknown',
+        confidence: investment.confidence
+      }
     };
 
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    if (!mockTransaction.success) {
-      throw new Error('Transaction failed');
+    // Validate payment request
+    if (!X402Utils.validatePaymentRequest(paymentRequest)) {
+      throw new Error('Invalid payment request');
     }
 
-    return mockTransaction;
+    try {
+      // Create payment via x402
+      const paymentResponse = await x402Client.createPayment(paymentRequest);
+      
+      // Wait for payment completion if pending
+      if (paymentResponse.status === 'pending') {
+        let attempts = 0;
+        const maxAttempts = 30; // 30 seconds max wait
+        
+        while (attempts < maxAttempts) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          const status = await x402Client.getPaymentStatus(paymentResponse.id);
+          
+          if (status.status === 'completed') {
+            return {
+              marketId: investment.marketId,
+              amount: investment.recommendedAmount,
+              prediction: investment.aiPrediction,
+              txHash: status.transactionHash || paymentResponse.id,
+              timestamp: status.completedAt || new Date().toISOString(),
+              success: true,
+              paymentId: paymentResponse.id
+            };
+          } else if (status.status === 'failed') {
+            throw new Error(status.error || 'Payment failed');
+          }
+          
+          attempts++;
+        }
+        
+        throw new Error('Payment timeout - please check status manually');
+      } else if (paymentResponse.status === 'completed') {
+        return {
+          marketId: investment.marketId,
+          amount: investment.recommendedAmount,
+          prediction: investment.aiPrediction,
+          txHash: paymentResponse.transactionHash || paymentResponse.id,
+          timestamp: paymentResponse.completedAt || new Date().toISOString(),
+          success: true,
+          paymentId: paymentResponse.id
+        };
+      } else {
+        throw new Error(paymentResponse.error || 'Payment failed');
+      }
+    } catch (error) {
+      console.error('x402 payment failed:', error);
+      throw error;
+    }
   };
 
   const totalInvestmentAmount = investmentPlan.reduce((sum, inv) => sum + inv.recommendedAmount, 0);
