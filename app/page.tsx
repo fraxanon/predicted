@@ -3,6 +3,9 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 import { Badge } from '../components/ui/Badge';
+import { AIAnalytics } from '../components/AIAnalytics';
+import { InterestOnboarding } from '../components/InterestOnboarding';
+import { useUserProfile } from '../hooks/useUserProfile';
 import { useState } from 'react';
 
 // Web3-focused market data
