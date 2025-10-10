@@ -43,25 +43,25 @@ class IQPredictSystem {
    */
   private setupEventHandlers() {
     // Oracle Agent → Prediction Market Agent
-    this.agentSystem.on('newWeb3Event', (eventData) => {
+    this.agentSystem.on('newWeb3Event', (eventData: any) => {
       console.log('🔮 New Web3 event detected:', eventData.title);
       this.agentSystem.emit('createMarket', eventData);
     });
 
     // Prediction Market Agent → Analytics Agent
-    this.agentSystem.on('marketCreated', (marketData) => {
+    this.agentSystem.on('marketCreated', (marketData: any) => {
       console.log('📊 New market created:', marketData.id);
       this.agentSystem.emit('analyzeMarket', marketData);
     });
 
     // User bet → Betting Agent
-    this.agentSystem.on('userBet', (betData) => {
+    this.agentSystem.on('userBet', (betData: any) => {
       console.log('💰 New bet placed:', betData.amount);
       this.agentSystem.emit('processBet', betData);
     });
 
     // Oracle resolution → Betting Agent
-    this.agentSystem.on('eventResolved', (resolutionData) => {
+    this.agentSystem.on('eventResolved', (resolutionData: any) => {
       console.log('✅ Event resolved:', resolutionData.outcome);
       this.agentSystem.emit('distributePayout', resolutionData);
     });

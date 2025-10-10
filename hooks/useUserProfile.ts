@@ -21,6 +21,8 @@ export interface PersonalizedRecommendation {
   riskLevel: 'low' | 'medium' | 'high';
   reasoning: string;
   matchScore: number; // How well it matches user interests (0-1)
+  currentOdds?: { yes: number; no: number };
+  endDate?: string;
 }
 
 export interface EarningsProjection {

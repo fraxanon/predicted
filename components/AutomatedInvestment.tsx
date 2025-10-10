@@ -152,7 +152,7 @@ export function AutomatedInvestment({ totalBudget, onInvestmentComplete }: Autom
           results.push({
             marketId: investment.marketId,
             success: false,
-            error: error.message,
+            error: error instanceof Error ? error.message : 'Unknown error',
             amount: investment.recommendedAmount
           });
         }

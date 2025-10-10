@@ -85,8 +85,8 @@ async function generateOptimizedInvestmentPlan(
     if (currentCategoryExposure >= maxCategoryExposure) continue;
     
     // Check risk constraints
-    const targetRiskBudget = totalBudget * riskAllocation[rec.riskLevel];
-    const currentRiskExposure = riskExposure[rec.riskLevel];
+    const targetRiskBudget = totalBudget * (riskAllocation[rec.riskLevel as keyof typeof riskAllocation] || 0);
+    const currentRiskExposure = riskExposure[rec.riskLevel as keyof typeof riskExposure];
     
     if (currentRiskExposure >= targetRiskBudget) continue;
     
@@ -120,7 +120,7 @@ async function generateOptimizedInvestmentPlan(
       
       remainingBudget -= investmentAmount;
       categoryExposure.set(rec.category, currentCategoryExposure + investmentAmount);
-      riskExposure[rec.riskLevel] += investmentAmount;
+      riskExposure[rec.riskLevel as keyof typeof riskExposure] += investmentAmount;
     }
   }
 
