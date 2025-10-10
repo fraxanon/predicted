@@ -220,7 +220,6 @@ function DashboardPage() {
                 <div className="w-8 h-8 bg-white flex items-center justify-center">
                   <span className="text-black-950 font-bold text-sm">[P]</span>
                 </div>
-                <span className="text-white font-bold text-lg font-typewriter">[Predicted]</span>
                 <span className="text-xs bg-accent-500 text-black-950 px-1 py-0.5 font-bold">🇺🇸</span>
               </div>
               
