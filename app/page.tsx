@@ -7,6 +7,7 @@ import { AIAnalytics } from '../components/AIAnalytics';
 import { InterestOnboarding } from '../components/InterestOnboarding';
 import { ProfileSettings } from '../components/ProfileSettings';
 import { IndividualBetting } from '../components/IndividualBetting';
+import { SimpleAgentStatus } from '../components/SimpleAgentStatus';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { useState, useEffect } from 'react';
 
@@ -231,11 +232,13 @@ function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSettings, setShowSettings] = useState(false);
   const [investedMarkets, setInvestedMarkets] = useState<Set<string>>(new Set());
-  const { recommendations } = useUserProfile();
+  
+  // Mock recommendations for now
+  const recommendations: any[] = [];
 
   // Track markets that the AI agent has invested in
   useEffect(() => {
-    const invested = new Set(recommendations.map(rec => rec.marketId));
+    const invested = new Set(recommendations.map((rec: any) => rec.marketId));
     setInvestedMarkets(invested);
   }, [recommendations]);
 
@@ -315,92 +318,88 @@ function DashboardPage() {
                 {category}
               </button>
             ))}
+            <a 
+              href="/dashboard"
+              className="text-sm whitespace-nowrap transition-colors text-black-400 hover:text-white"
+            >
+              Cashier Dashboard
+            </a>
             <button className="text-black-400 hover:text-white text-sm">More</button>
           </div>
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* AI Analytics Dashboard */}
-        <div className="mb-6">
-          <AIAnalytics showDashboard={true} />
-        </div>
-
-        {/* Mobile Search */}
-        <div className="md:hidden mb-4">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search predicted"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-black-800 border border-black-700 text-white placeholder-black-400 px-4 py-2 text-sm focus:outline-none focus:border-accent-500 transition-colors"
-            />
-            <span className="absolute right-3 top-2.5 text-black-400 text-xs">/</span>
+      <main className="bg-black-950 min-h-screen p-2 md:p-4">
+        <div className="max-w-7xl mx-auto">
+          {/* Compact AI Analytics */}
+          <div className="mb-4">
+            <AIAnalytics showDashboard={true} />
           </div>
-        </div>
 
-        {/* Filters and Controls */}
-        <div className="mb-6">
-          <div className="flex flex-col lg:flex-row gap-4 mb-4">
-            <div className="flex items-center space-x-2">
-              <button className="flex items-center space-x-1 px-3 py-2 bg-black-800 border border-black-700 text-white hover:border-black-600 transition-colors text-sm">
-                <span>⚙️</span>
-              </button>
-              <button className="flex items-center space-x-1 px-3 py-2 bg-black-800 border border-black-700 text-white hover:border-black-600 transition-colors text-sm">
-                <span>📌</span>
-              </button>
+          {/* Mobile Search */}
+          <div className="md:hidden mb-3">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search predicted"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-black-800 border border-black-700 text-white placeholder-black-400 px-3 py-2 text-sm focus:outline-none focus:border-accent-500 transition-colors"
+              />
+              <span className="absolute right-3 top-2.5 text-black-400 text-xs">/</span>
             </div>
           </div>
 
-          {/* Filter Tags */}
-          <div className="flex flex-wrap gap-2">
-            {FILTERS.map((filter) => (
-              <button
-                key={filter}
-                onClick={() => setSelectedFilter(filter)}
-                className={`px-3 py-1 text-xs border transition-colors ${
-                  selectedFilter === filter
-                    ? 'bg-white text-black-950 border-white'
-                    : 'bg-transparent text-black-300 border-black-700 hover:border-black-600'
-                }`}
-              >
-                {filter}
-              </button>
-            ))}
+          {/* Compact Filters */}
+          <div className="mb-4">
+            <div className="flex flex-wrap gap-2 mb-3">
+              {FILTERS.slice(0, 6).map((filter) => (
+                <button
+                  key={filter}
+                  onClick={() => setSelectedFilter(filter)}
+                  className={`px-2 py-1 text-xs border transition-colors ${
+                    selectedFilter === filter
+                      ? 'bg-accent-500 text-black-950 border-accent-500'
+                      : 'bg-transparent text-black-300 border-black-700 hover:border-black-600'
+                  }`}
+                >
+                  {filter}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Markets Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {TRENDING_MARKETS.map((market) => {
-            const isInvested = investedMarkets.has(market.id);
-            const investedRec = recommendations.find(rec => rec.marketId === market.id);
-            
-            return (
-              <IndividualBetting 
-                key={market.id} 
-                market={{
-                  ...market,
-                  aiPrediction: market.chance > 50 ? 'yes' : 'no',
-                  confidence: Math.min(0.95, Math.max(0.65, market.chance / 100)),
-                  isInvested,
-                  investedAmount: investedRec ? Math.round(investedRec.potentialReturn * 100) : undefined
-                }}
-                onBetPlaced={(result) => {
-                  console.log('Individual bet placed:', result);
-                  // Handle bet result (show success message, update UI, etc.)
-                }}
-              />
-            );
-          })}
-        </div>
+          {/* Markets Grid - Original Layout */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
+            {TRENDING_MARKETS.map((market) => {
+              const isInvested = investedMarkets.has(market.id);
+              const investedRec = recommendations.find((rec: any) => rec.marketId === market.id);
+              
+              return (
+                <IndividualBetting 
+                  key={market.id} 
+                  market={{
+                    ...market,
+                    aiPrediction: market.chance > 50 ? 'yes' : 'no',
+                    confidence: Math.min(0.95, Math.max(0.65, market.chance / 100)),
+                    isInvested,
+                    investedAmount: investedRec ? Math.round(investedRec.potentialReturn * 100) : undefined
+                  }}
+                  onBetPlaced={(result) => {
+                    console.log('Individual bet placed:', result);
+                    // Handle bet result (show success message, update UI, etc.)
+                  }}
+                />
+              );
+            })}
+          </div>
 
-        {/* Load More */}
-        <div className="text-center mt-8">
-          <button className="px-6 py-2 bg-black-800 border border-black-700 text-white hover:border-black-600 transition-colors text-sm">
-            Load more markets
-          </button>
+          {/* Load More */}
+          <div className="text-center mt-6">
+            <button className="px-6 py-2 bg-black-800 border border-black-700 text-white hover:border-black-600 transition-colors text-sm">
+              Load more markets
+            </button>
+          </div>
         </div>
       </main>
 

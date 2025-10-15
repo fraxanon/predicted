@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useAccount, useSignMessage } from 'wagmi';
 import { AutomatedInvestment } from './AutomatedInvestment';
+import { AgentSettings } from './AgentSettings';
 
 interface InterestCategory {
   id: string;
@@ -102,6 +103,7 @@ export function InterestOnboarding({ onComplete }: InterestOnboardingProps) {
   const [investmentAmount, setInvestmentAmount] = useState(100);
   const [isLoading, setIsLoading] = useState(false);
   const [signedData, setSignedData] = useState<{ message: string; signature: string } | null>(null);
+  const [showAgentSettings, setShowAgentSettings] = useState(false);
 
   const handleInterestToggle = (interestId: string) => {
     setSelectedInterests(prev => 
@@ -180,12 +182,12 @@ export function InterestOnboarding({ onComplete }: InterestOnboardingProps) {
       <div className="border-b border-black-800 p-4">
         <div className="flex items-center justify-between mb-2">
           <span className="text-white font-medium">Profile Setup</span>
-          <span className="text-black-400 text-sm">Step {step} of 4</span>
+          <span className="text-black-400 text-sm">Step {showAgentSettings ? 5 : step} of 5</span>
         </div>
         <div className="h-1 bg-black-800 overflow-hidden">
           <div 
             className="h-full bg-accent-500 transition-all duration-300"
-            style={{ width: `${(step / 4) * 100}%` }}
+            style={{ width: `${showAgentSettings ? 100 : (step / 5) * 100}%` }}
           ></div>
         </div>
       </div>
@@ -426,7 +428,7 @@ export function InterestOnboarding({ onComplete }: InterestOnboardingProps) {
               totalBudget={investmentAmount}
               onInvestmentComplete={(results) => {
                 console.log('Investment completed:', results);
-                handleComplete();
+                setShowAgentSettings(true);
               }}
             />
 
@@ -438,10 +440,37 @@ export function InterestOnboarding({ onComplete }: InterestOnboardingProps) {
                 Back
               </button>
               <button
-                onClick={handleComplete}
+                onClick={() => setShowAgentSettings(true)}
                 className="px-8 py-3 border border-black-700 text-white hover:border-black-600 transition-colors"
               >
-                Skip Investment & Complete
+                Skip Investment & Continue
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 5: Agent Settings */}
+        {showAgentSettings && (
+          <div>
+            <AgentSettings 
+              showAfterOnboarding={true}
+              onSettingsChange={(settings) => {
+                console.log('Agent settings updated:', settings);
+              }}
+            />
+            
+            <div className="flex justify-between mt-8">
+              <button
+                onClick={() => setShowAgentSettings(false)}
+                className="px-6 py-2 border border-black-700 text-white hover:border-black-600 transition-colors"
+              >
+                Back to Investment
+              </button>
+              <button
+                onClick={handleComplete}
+                className="px-8 py-3 bg-accent-500 text-black-950 font-medium hover:bg-accent-600 transition-colors"
+              >
+                Complete Setup
               </button>
             </div>
           </div>
