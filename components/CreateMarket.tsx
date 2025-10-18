@@ -10,11 +10,233 @@ import { Button } from './ui/Button';
 import { Plus, Zap, DollarSign, Calendar, Hash, Flame } from 'lucide-react';
 
 export function CreateMarket() {
-  // Simple test first
+  const [isOpen, setIsOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    category: 'CRYPTO' as MarketCategory,
+    endDate: ''
+  });
+
+  const { 
+    createMarket, 
+    isCreating, 
+    isConnected, 
+    isOnFraxtal, 
+    switchToFraxtal,
+    creationFee 
+  } = useFraxtalMarkets();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!isConnected) {
+      alert('Please connect your wallet first!');
+      return;
+    }
+
+    if (!formData.title || !formData.endDate) {
+      alert('Please fill in all required fields!');
+      return;
+    }
+
+    try {
+      const endDate = new Date(formData.endDate);
+      
+      const marketParams: CreateMarketParams = {
+        question: formData.title,
+        description: formData.description,
+        category: formData.category,
+        endDate: endDate
+      };
+
+      const tx = await createMarket(marketParams);
+      
+      if (tx) {
+        alert('🎉 Market created successfully on Fraxtal! Transaction: ' + tx.hash);
+        setFormData({
+          title: '',
+          description: '',
+          category: 'CRYPTO',
+          endDate: ''
+        });
+        setIsOpen(false);
+      }
+    } catch (error: any) {
+      console.error('Market creation failed:', error);
+      alert('❌ Market creation failed: ' + (error.message || 'Unknown error'));
+    }
+  };
+
+  if (!isOpen) {
+    return (
+      <div className="bg-black-800 border-2 border-dashed border-orange-500/30 hover:border-orange-500/60 transition-all duration-300 bg-gradient-to-br from-orange-500/5 to-red-500/5 rounded-lg p-8 text-center">
+        <button
+          onClick={() => setIsOpen(true)}
+          className="group flex flex-col items-center gap-4 w-full"
+        >
+          <div className="relative">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+              <Plus className="w-8 h-8 text-white" />
+            </div>
+            <div className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center animate-pulse">
+              <Flame className="w-3 h-3 text-white" />
+            </div>
+          </div>
+          
+          <div>
+            <h3 className="text-xl font-bold text-white mb-2 group-hover:text-orange-400 transition-colors">
+              CREATE DEGEN MARKET
+            </h3>
+            <p className="text-black-400 text-sm max-w-md">
+              Launch your own prediction market and earn fees from every bet. 
+              <span className="text-orange-400 font-semibold"> Pay {creationFee} frxETH to create.</span>
+            </p>
+          </div>
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-green-500 p-4 text-white rounded-lg">
-      <h3>🔥 CREATE DEGEN MARKET - TEST</h3>
-      <p>If you can see this, the component is working!</p>
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+      <div className="bg-black-800 border border-orange-500/50 rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-4 border-b border-orange-500/20">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center">
+              <Flame className="w-4 h-4 text-white" />
+            </div>
+            <h2 className="text-orange-400 font-bold">CREATE DEGEN MARKET</h2>
+          </div>
+          <button
+            onClick={() => setIsOpen(false)}
+            className="text-black-400 hover:text-white transition-colors"
+          >
+            ✕
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-4 space-y-4">
+          {/* Market Question */}
+          <div>
+            <label className="block text-sm font-semibold text-white mb-2">
+              Market Question *
+            </label>
+            <input
+              type="text"
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              placeholder="Will Pepe reach $1 by end of 2024?"
+              className="w-full px-4 py-3 bg-black-900 border border-black-600 rounded-lg text-white placeholder-black-400 focus:border-orange-500 focus:outline-none transition-colors"
+              required
+            />
+            <p className="text-xs text-black-400 mt-1">Make it spicy! Degen markets perform better 🌶️</p>
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="block text-sm font-semibold text-white mb-2">
+              Description
+            </label>
+            <textarea
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="Explain the market conditions, what counts as a win, etc..."
+              rows={3}
+              className="w-full px-4 py-3 bg-black-900 border border-black-600 rounded-lg text-white placeholder-black-400 focus:border-orange-500 focus:outline-none transition-colors resize-none"
+            />
+          </div>
+
+          {/* Category and End Date */}
+          <div className="grid grid-cols-1 gap-4">
+            <div>
+              <label className="block text-sm font-semibold text-white mb-2">
+                Category *
+              </label>
+              <select
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value as MarketCategory })}
+                className="w-full px-4 py-3 bg-black-900 border border-black-600 rounded-lg text-white focus:border-orange-500 focus:outline-none transition-colors"
+              >
+                {MARKET_CATEGORIES.map((cat: MarketCategory) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-white mb-2">
+                📅 End Date *
+              </label>
+              <input
+                type="date"
+                value={formData.endDate}
+                onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                className="w-full px-4 py-3 bg-black-900 border border-black-600 rounded-lg text-white focus:border-orange-500 focus:outline-none transition-colors"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Creation Fee */}
+          <div className="bg-black-900 border border-orange-500/30 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Hash className="w-4 h-4 text-orange-400" />
+                <span className="text-white font-semibold">Creation Fee</span>
+              </div>
+              <div className="text-right">
+                <div className="text-xl font-bold text-orange-400">{creationFee} frxETH</div>
+                <div className="text-xs text-black-400">≈ $25.50 USD</div>
+              </div>
+            </div>
+            <p className="text-xs text-black-400 mt-2">
+              You'll earn 2% of all trading volume on your market! 💰
+            </p>
+          </div>
+
+          {/* Network Status */}
+          {isConnected && !isOnFraxtal && (
+            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                  <span className="text-yellow-400 text-sm font-medium">Switch to Fraxtal Network</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={switchToFraxtal}
+                  className="px-3 py-1 bg-yellow-500 hover:bg-yellow-600 text-black-950 text-xs font-bold rounded transition-colors"
+                >
+                  Switch Network
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex gap-3 pt-4">
+            <button
+              type="button"
+              onClick={() => setIsOpen(false)}
+              className="flex-1 px-4 py-3 border border-black-600 text-white hover:border-black-500 transition-colors rounded-lg"
+            >
+              CANCEL
+            </button>
+            <button
+              type="submit"
+              disabled={isCreating || !isConnected}
+              className="flex-1 px-4 py-3 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <Zap className="w-4 h-4 mr-2 inline" />
+              {isCreating ? 'CREATING...' : 
+               !isConnected ? 'CONNECT WALLET' :
+               !isOnFraxtal ? 'SWITCH TO FRAXTAL' : 
+               'CREATE & PAY'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
