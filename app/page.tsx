@@ -5,11 +5,12 @@ import { useAccount } from 'wagmi';
 import { Badge } from '../components/ui/Badge';
 import { AIAnalytics } from '../components/AIAnalytics';
 import { InterestOnboarding } from '../components/InterestOnboarding';
-import { ProfileSettings } from '../components/ProfileSettings';
 import { IndividualBetting } from '../components/IndividualBetting';
 import { SimpleAgentStatus } from '../components/SimpleAgentStatus';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 // Web3-focused market data
 const TRENDING_MARKETS = [
@@ -89,7 +90,7 @@ const TRENDING_MARKETS = [
 
 const CATEGORIES = [
   'Trending', 'Breaking', 'New', 'DeFi', 'L2', 'BTC', 'ETH', 
-  'Gaming', 'NFTs', 'DAOs', 'Airdrops', 'Governance'
+  'Gaming', 'NFTs', 'DAOs', 'Airdrops', 'Governance', 'Staking'
 ];
 
 const FILTERS = [
@@ -227,11 +228,18 @@ function LandingPage() {
 }
 
 function DashboardPage() {
+  const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState('Trending');
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const [showSettings, setShowSettings] = useState(false);
   const [investedMarkets, setInvestedMarkets] = useState<Set<string>>(new Set());
+  const [showAgentDropdown, setShowAgentDropdown] = useState(false);
+  const [activeAgentDropdown, setActiveAgentDropdown] = useState<string | null>(null);
+  
+  // Toggle agent dropdown
+  const toggleAgentDropdown = (agentId: string) => {
+    setActiveAgentDropdown(activeAgentDropdown === agentId ? null : agentId);
+  };
   
   // Mock recommendations for now
   const recommendations: any[] = [];
@@ -241,6 +249,8 @@ function DashboardPage() {
     const invested = new Set(recommendations.map((rec: any) => rec.marketId));
     setInvestedMarkets(invested);
   }, [recommendations]);
+
+  // Sidebar only closes via the "✕" button - no auto-close functionality
 
   return (
     <>
@@ -255,6 +265,16 @@ function DashboardPage() {
                   <span className="text-black-950 font-bold text-sm">[P]</span>
                 </div>
                 <span className="text-xs bg-accent-500 text-black-950 px-1 py-0.5 font-bold">🇺🇸</span>
+              </div>
+              
+              {/* Navigation Links */}
+              <div className="hidden lg:flex items-center space-x-6">
+                <a href="/docs" className="text-black-400 hover:text-white text-sm transition-colors">
+                  Docs
+                </a>
+                <a href="/treasury" className="text-black-400 hover:text-white text-sm transition-colors">
+                  Treasury
+                </a>
               </div>
               
               {/* Search */}
@@ -279,12 +299,57 @@ function DashboardPage() {
                 <div className="text-white text-sm font-medium">Portfolio</div>
                 <div className="text-accent-500 text-xs">$0.00</div>
               </a>
-              <button 
-                onClick={() => setShowSettings(true)}
-                className="text-white hover:text-accent-500 transition-colors p-2"
-              >
-                <span>⚙️</span>
-              </button>
+              
+              {/* AI Agents Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowAgentDropdown(!showAgentDropdown)}
+                  className="flex items-center space-x-2 px-3 py-2 bg-accent-500 hover:bg-accent-600 text-black-950 rounded-lg transition-colors"
+                >
+                  <span className="text-sm font-medium">🤖 AI Agents</span>
+                  <span className={`transition-transform ${showAgentDropdown ? 'rotate-180' : ''}`}>▼</span>
+                </button>
+
+                {/* Dropdown Menu */}
+                {showAgentDropdown && (
+                  <div className="absolute top-full left-0 mt-2 w-80 bg-black-800 border border-black-700 rounded-lg shadow-xl z-50">
+                    <div className="p-4">
+                      <h3 className="text-white font-semibold mb-3">AI Agents</h3>
+                      <div className="space-y-2">
+                        {/* Oracle Agent */}
+                        <button
+                          onClick={() => {
+                            setShowAgentDropdown(false);
+                            setTimeout(() => {
+                              window.location.href = '/oracle-dashboard';
+                            }, 100);
+                          }}
+                          className="w-full flex items-center p-3 rounded-lg bg-purple-500/10 border border-purple-500/30 hover:bg-purple-500/20 transition-colors text-left"
+                        >
+                          <div className="flex-1">
+                            <div className="text-purple-400 font-medium text-sm">🔮 Oracle + Deployer - "Seer & Builder"</div>
+                            <div className="text-gray-400 text-xs">Market discovery and decentralized prediction market creation</div>
+                          </div>
+                        </button>
+
+                        {/* Analytics + Trading Agent */}
+                        <button
+                          onClick={() => {
+                            setShowAgentDropdown(false);
+                            window.location.href = '/dashboard';
+                          }}
+                          className="w-full flex items-center p-3 rounded-lg bg-green-500/10 border border-green-500/30 hover:bg-green-500/20 transition-colors text-left"
+                        >
+                          <div className="flex-1">
+                            <div className="text-green-400 font-medium text-sm">📊💰 Analytics + Trading - "Prophet & Cashier"</div>
+                            <div className="text-gray-400 text-xs">AI market analysis and autonomous investment management</div>
+                          </div>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
               <ConnectButton 
                 chainStatus="icon"
                 accountStatus={{
@@ -298,32 +363,39 @@ function DashboardPage() {
       </header>
 
       {/* Navigation Bar */}
-      <nav className="border-b border-black-800 bg-black-900">
+      <nav className="border-b border-black-800 bg-black-900 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center space-x-6 py-3 overflow-x-auto">
             <div className="flex items-center space-x-2 text-accent-500">
               <span className="text-sm">📈</span>
               <span className="text-sm font-medium text-white">Trending</span>
             </div>
-            {CATEGORIES.slice(1).map((category) => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`text-sm whitespace-nowrap transition-colors ${
-                  selectedCategory === category 
-                    ? 'text-white font-medium' 
-                    : 'text-black-400 hover:text-white'
-                }`}
-              >
-                {category}
-              </button>
-            ))}
-            <a 
-              href="/dashboard"
-              className="text-sm whitespace-nowrap transition-colors text-black-400 hover:text-white"
-            >
-              Cashier Dashboard
-            </a>
+            {CATEGORIES.slice(1).map((category) => {
+              if (category === 'Staking') {
+                return (
+                  <a
+                    key={category}
+                    href="/staking"
+                    className="text-sm text-black-400 hover:text-white transition-colors"
+                  >
+                    {category}
+                  </a>
+                );
+              }
+              return (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`text-sm transition-colors ${
+                    selectedCategory === category
+                      ? 'text-white font-medium'
+                      : 'text-black-400 hover:text-white'
+                  }`}
+                >
+                  {category}
+                </button>
+              );
+            })}
             <button className="text-black-400 hover:text-white text-sm">More</button>
           </div>
         </div>
@@ -335,6 +407,9 @@ function DashboardPage() {
           <div className="mb-4">
             <AIAnalytics showDashboard={true} />
           </div>
+
+
+
 
           {/* Mobile Search */}
           <div className="md:hidden mb-3">
@@ -371,6 +446,9 @@ function DashboardPage() {
 
           {/* Markets Grid - Original Layout */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
+            {/* Create Market Card - Same size as other cards */}
+            <CreateMarketCard />
+            
             {TRENDING_MARKETS.map((market) => {
               const isInvested = investedMarkets.has(market.id);
               const investedRec = recommendations.find((rec: any) => rec.marketId === market.id);
@@ -403,10 +481,14 @@ function DashboardPage() {
         </div>
       </main>
 
-      {/* Profile Settings Modal */}
-      {showSettings && (
-        <ProfileSettings onClose={() => setShowSettings(false)} />
+      {/* Backdrop for dropdown */}
+      {showAgentDropdown && (
+        <div 
+          className="fixed inset-0 bg-black/20 z-30" 
+          onClick={() => setShowAgentDropdown(false)}
+        />
       )}
+
     </>
   );
 }
@@ -517,5 +599,201 @@ function MarketCard({ market }: { market: any }) {
         </div>
       </div>
     </a>
+  );
+}
+
+function CreateMarketCard() {
+  const [showModal, setShowModal] = useState(false);
+
+  return (
+    <>
+      <button
+        onClick={() => setShowModal(true)}
+        className="block bg-black-900 border border-black-800 hover:border-orange-500/50 transition-all duration-200 hover:-translate-y-0.5 text-left w-full"
+      >
+        <div className="p-4">
+          {/* Header - exact same as other cards */}
+          <div className="flex items-start justify-between mb-3">
+            <div className="flex items-center space-x-2">
+              <span className="text-xs px-2 py-1 bg-orange-500/20 text-orange-400 border border-orange-500/30">
+                CREATE
+              </span>
+            </div>
+            <div className="text-right">
+              <div className="text-2xl font-bold text-orange-400">+</div>
+              <div className="text-xs text-black-400">new market</div>
+            </div>
+          </div>
+
+          {/* Title - same height as other cards */}
+          <h3 className="text-white font-medium mb-4 leading-tight text-sm line-clamp-2">
+            Create Your Own Degen Market
+          </h3>
+
+          {/* Betting Options - same spacing as other cards */}
+          <div className="grid grid-cols-2 gap-2 mb-4">
+            <div className="flex items-center justify-center p-2 bg-green-600 hover:bg-green-700 transition-colors">
+              <span className="text-white text-sm font-bold">Create 0.01 ETH</span>
+            </div>
+            <div className="flex items-center justify-center p-2 bg-red-600 hover:bg-red-700 transition-colors">
+              <span className="text-white text-sm font-bold">Earn 2%</span>
+            </div>
+          </div>
+
+          {/* Footer - exact same as other cards */}
+          <div className="flex items-center justify-between text-xs text-black-400">
+            <span>AI: <span className="text-orange-400 font-bold">CREATE</span></span>
+            <span>🔥</span>
+          </div>
+        </div>
+      </button>
+
+      {/* Create Market Modal */}
+      {showModal && <CreateMarketModal onClose={() => setShowModal(false)} />}
+    </>
+  );
+}
+
+function CreateMarketModal({ onClose }: { onClose: () => void }) {
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    category: 'CRYPTO',
+    endDate: '',
+    creationFee: '0.01'
+  });
+
+  const categories = ['CRYPTO', 'DEFI', 'LAUNCH', 'AIRDROP', 'GOVERNANCE', 'MEME', 'DEGEN'];
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // TODO: Add Web3 integration later
+    console.log('Creating market:', formData);
+    alert('🚀 Market creation coming soon! Web3 integration in progress...');
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <div className="bg-black-900 border border-orange-500/50 rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="border-b border-orange-500/20 p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-6 h-6 rounded-full bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center">
+                <span className="text-white text-sm">🔥</span>
+              </div>
+              <h3 className="text-orange-400 font-bold">CREATE DEGEN MARKET</h3>
+            </div>
+            <button
+              onClick={onClose}
+              className="text-black-400 hover:text-white transition-colors text-lg"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+
+        {/* Form */}
+        <div className="p-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Market Title */}
+            <div>
+              <label className="block text-sm font-semibold text-white mb-2">
+                Market Question *
+              </label>
+              <input
+                type="text"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                placeholder="Will Pepe reach $1 by end of 2024?"
+                className="w-full px-3 py-2 bg-black-800 border border-black-600 rounded text-white placeholder-black-400 focus:border-orange-500 focus:outline-none transition-colors text-sm"
+                required
+              />
+              <p className="text-xs text-black-400 mt-1">Make it spicy! Degen markets perform better 🌶️</p>
+            </div>
+
+            {/* Description */}
+            <div>
+              <label className="block text-sm font-semibold text-white mb-2">
+                Description
+              </label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Explain the market conditions, what counts as a win, etc..."
+                rows={3}
+                className="w-full px-3 py-2 bg-black-800 border border-black-600 rounded text-white placeholder-black-400 focus:border-orange-500 focus:outline-none transition-colors resize-none text-sm"
+              />
+            </div>
+
+            {/* Category and End Date Row */}
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-white mb-2">
+                  Category *
+                </label>
+                <select
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  className="w-full px-3 py-2 bg-black-800 border border-black-600 rounded text-white focus:border-orange-500 focus:outline-none transition-colors text-sm"
+                >
+                  {categories.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-white mb-2">
+                  📅 End Date *
+                </label>
+                <input
+                  type="date"
+                  value={formData.endDate}
+                  onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                  className="w-full px-3 py-2 bg-black-800 border border-black-600 rounded text-white focus:border-orange-500 focus:outline-none transition-colors text-sm"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Creation Fee Display */}
+            <div className="bg-black-800 border border-orange-500/30 rounded p-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-orange-400">#</span>
+                  <span className="text-white font-semibold text-sm">Creation Fee</span>
+                </div>
+                <div className="text-right">
+                  <div className="text-lg font-bold text-orange-400">{formData.creationFee} ETH</div>
+                  <div className="text-xs text-black-400">≈ $25.50 USD</div>
+                </div>
+              </div>
+              <p className="text-xs text-black-400 mt-2">
+                You'll earn 2% of all trading volume on your market! 💰
+              </p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3 pt-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 px-4 py-2 bg-black-800 border border-black-600 text-white hover:border-black-500 transition-colors text-sm rounded"
+              >
+                CANCEL
+              </button>
+              <button
+                type="submit"
+                className="flex-1 px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold text-sm rounded transition-all"
+              >
+                ⚡ CREATE & PAY
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -2,13 +2,26 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  webpack: (config) => {
+  experimental: {
+    esmExternals: true,
+  },
+  transpilePackages: ['@iqai/adk', 'chalk'],
+  webpack: (config, { isServer }) => {
     config.resolve.fallback = {
       ...config.resolve.fallback,
       fs: false,
       net: false,
       tls: false,
     };
+    
+    // Handle ESM packages
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        module: false,
+      };
+    }
+    
     return config;
   },
   async headers() {

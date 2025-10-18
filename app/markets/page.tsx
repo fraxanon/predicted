@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
@@ -63,6 +64,22 @@ const CATEGORIES = ['ALL', 'LAUNCH', 'AIRDROP', 'DEFI', 'CRYPTO', 'GOVERNANCE'];
 
 export default function MarketsPage() {
   const { isConnected } = useAccount();
+  
+  // Agent dropdown state
+  const [showAgentDropdown, setShowAgentDropdown] = useState(false);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (showAgentDropdown && !target.closest('.agent-dropdown')) {
+        setShowAgentDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showAgentDropdown]);
 
   return (
     <div className="min-h-screen bg-black-950">
@@ -76,13 +93,116 @@ export default function MarketsPage() {
               </a>
               <Logo size="md" />
             </div>
-            <ConnectButton 
-              chainStatus="icon"
-              accountStatus={{
-                smallScreen: 'avatar',
-                largeScreen: 'full',
-              }}
-            />
+            
+            <div className="flex items-center space-x-4">
+              {/* Agent Dropdown */}
+              <div className="relative agent-dropdown">
+                <button
+                  onClick={() => setShowAgentDropdown(!showAgentDropdown)}
+                  className="flex items-center space-x-2 text-white hover:text-accent-400 text-sm font-medium transition-colors"
+                >
+                  <span>Agents</span>
+                  <svg 
+                    className={`w-4 h-4 transition-transform ${showAgentDropdown ? 'rotate-180' : ''}`}
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {/* Dropdown Menu */}
+                {showAgentDropdown && (
+                  <div className="absolute right-0 mt-2 w-56 bg-black-800 border border-black-700 rounded-lg shadow-lg z-50">
+                    <div className="py-2">
+                      {/* Active Agents */}
+                      <a
+                        href="/dashboard"
+                        className="flex items-center px-4 py-2 text-sm text-white hover:bg-black-700 transition-colors"
+                      >
+                        <div className="w-2 h-2 bg-accent-500 rounded-full mr-3"></div>
+                        <div>
+                          <div className="font-medium">Cashier Agent</div>
+                          <div className="text-xs text-gray-400">Investment Management</div>
+                        </div>
+                      </a>
+
+                      <a
+                        href="/prophet-dashboard"
+                        className="flex items-center px-4 py-2 text-sm text-white hover:bg-black-700 transition-colors"
+                      >
+                        <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                        <div>
+                          <div className="font-medium">Prophet Agent</div>
+                          <div className="text-xs text-gray-400">Market Analysis</div>
+                        </div>
+                      </a>
+
+                      {/* Divider */}
+                      <div className="border-t border-black-700 my-2"></div>
+
+                      {/* Other Agents - Coming Soon */}
+                      <div className="px-4 py-1">
+                        <div className="text-xs text-gray-500 font-medium uppercase tracking-wide">Coming Soon</div>
+                      </div>
+
+                      <a
+                        href="/oracle-dashboard"
+                        className="flex items-center px-4 py-2 text-sm text-gray-400 hover:bg-black-700 transition-colors cursor-not-allowed"
+                      >
+                        <div className="w-2 h-2 bg-gray-600 rounded-full mr-3"></div>
+                        <div>
+                          <div className="font-medium">Oracle Agent</div>
+                          <div className="text-xs text-gray-500">Data Intelligence</div>
+                        </div>
+                      </a>
+
+                      <a
+                        href="/sentinel-dashboard"
+                        className="flex items-center px-4 py-2 text-sm text-gray-400 hover:bg-black-700 transition-colors cursor-not-allowed"
+                      >
+                        <div className="w-2 h-2 bg-gray-600 rounded-full mr-3"></div>
+                        <div>
+                          <div className="font-medium">Sentinel Agent</div>
+                          <div className="text-xs text-gray-500">Risk Monitoring</div>
+                        </div>
+                      </a>
+
+                      <a
+                        href="/arbitrage-dashboard"
+                        className="flex items-center px-4 py-2 text-sm text-gray-400 hover:bg-black-700 transition-colors cursor-not-allowed"
+                      >
+                        <div className="w-2 h-2 bg-gray-600 rounded-full mr-3"></div>
+                        <div>
+                          <div className="font-medium">Arbitrage Agent</div>
+                          <div className="text-xs text-gray-500">Price Optimization</div>
+                        </div>
+                      </a>
+
+                      <a
+                        href="/liquidator-dashboard"
+                        className="flex items-center px-4 py-2 text-sm text-gray-400 hover:bg-black-700 transition-colors cursor-not-allowed"
+                      >
+                        <div className="w-2 h-2 bg-gray-600 rounded-full mr-3"></div>
+                        <div>
+                          <div className="font-medium">Liquidator Agent</div>
+                          <div className="text-xs text-gray-500">Position Management</div>
+                        </div>
+                      </a>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <ConnectButton 
+                chainStatus="icon"
+                accountStatus={{
+                  smallScreen: 'avatar',
+                  largeScreen: 'full',
+                }}
+              />
+            </div>
           </div>
         </div>
       </header>

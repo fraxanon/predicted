@@ -122,7 +122,7 @@ export class X402Client {
   /**
    * Make authenticated request to x402 API
    */
-  private async makeRequest(method: string, endpoint: string, body?: any): Promise<any> {
+  protected async makeRequest(method: string, endpoint: string, body?: any): Promise<any> {
     const url = `${this.baseUrl}${endpoint}`;
     const timestamp = Math.floor(Date.now() / 1000).toString();
     

@@ -1,7 +1,7 @@
 'use client';
 
 import { WagmiConfig, createConfig, configureChains } from 'wagmi';
-import { mainnet, polygon, arbitrum, optimism } from 'wagmi/chains';
+import { mainnet, polygon, arbitrum, optimism, base, baseSepolia } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
 import { alchemyProvider } from 'wagmi/providers/alchemy';
 import { RainbowKitProvider, getDefaultWallets } from '@rainbow-me/rainbowkit';
@@ -30,7 +30,7 @@ const fraxtal = {
 
 // Configure chains and providers
 const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [mainnet, polygon, arbitrum, optimism, fraxtal],
+  [baseSepolia, base, mainnet, polygon, arbitrum, optimism, fraxtal],
   [
     alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_ALCHEMY_ID || 'demo' }),
     publicProvider(),
@@ -124,7 +124,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
             },
           }}
           modalSize="compact"
-          initialChain={mainnet}
+          initialChain={baseSepolia}
         >
           {children}
         </RainbowKitProvider>

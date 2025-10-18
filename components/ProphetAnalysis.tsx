@@ -219,14 +219,6 @@ export function ProphetAnalysis({ onAuthorizeInvestment, budget: externalBudget,
             <div className="text-black-400 text-sm">Expected Profit</div>
             <div className="text-accent-400 text-xs">${Math.round(totalProfit).toLocaleString()}</div>
           </div>
-          <div>
-            <button
-              onClick={handleAddBudget}
-              className="px-3 py-1 bg-black-700 border border-black-600 text-white text-xs hover:border-black-500 transition-colors"
-            >
-              + Add Budget
-            </button>
-          </div>
         </div>
       </div>
 
@@ -261,51 +253,6 @@ export function ProphetAnalysis({ onAuthorizeInvestment, budget: externalBudget,
           </div>
         ))}
       </div>
-
-      {/* Authorization Status */}
-      {!isAuthorized ? (
-        <div className="mt-4 p-3 bg-yellow-900 bg-opacity-20 border border-yellow-800">
-          <div className="flex items-center justify-between">
-            <div>
-              <h4 className="text-yellow-400 font-medium text-sm">⚠️ Awaiting X402 Authorization</h4>
-              <p className="text-yellow-300 text-xs">
-                Cashier needs your approval to invest ${budget.toLocaleString()} {currency} into these markets
-              </p>
-            </div>
-            <button 
-              onClick={handleAuthorizeInvestment}
-              className="px-4 py-2 bg-accent-500 text-black-950 text-sm font-medium hover:bg-accent-600 transition-colors"
-            >
-              Authorize Investment
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className="mt-4 p-3 bg-green-900 bg-opacity-20 border border-green-800">
-          <div className="flex items-center justify-between">
-            <div>
-              <h4 className="text-green-400 font-medium text-sm">✅ Investment Authorized</h4>
-              <p className="text-green-300 text-xs">
-                Cashier will automatically invest in these markets when opportunities arise
-              </p>
-            </div>
-            <div className="flex space-x-2">
-              <button 
-                onClick={() => setIsAuthorized(false)}
-                className="px-3 py-1 border border-yellow-600 text-yellow-400 text-xs hover:border-yellow-500 transition-colors"
-              >
-                Revoke
-              </button>
-              <button 
-                onClick={handleAddBudget}
-                className="px-3 py-1 bg-accent-500 text-black-950 text-xs font-medium hover:bg-accent-600 transition-colors"
-              >
-                Add More Budget
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {currency === 'frxUSD' && (
         <div className="mt-3 p-2 bg-green-900 bg-opacity-20 border border-green-800 text-green-400 text-xs">
