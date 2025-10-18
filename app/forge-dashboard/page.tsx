@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
-export default function DeployerDashboard() {
-  const [activeTab, setActiveTab] = useState('deploy');
+export default function FraxtalMarketForge() {
+  const [activeTab, setActiveTab] = useState('forge');
+  const [isForging, setIsForging] = useState(false);
 
   // Mock data
   const deployedMarkets = [

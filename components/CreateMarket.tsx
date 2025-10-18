@@ -1,6 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { X } from 'lucide-react';
+import { useFraxtalMarkets, CreateMarketParams } from '../hooks/useFraxtalMarkets';
+import { MARKET_CATEGORIES, MarketCategory } from '../lib/fraxtal-config';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/Card';
 import { Badge } from './ui/Badge';
 import { Button } from './ui/Button';
@@ -21,18 +24,60 @@ export function CreateMarketFull() {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    category: 'CRYPTO',
+    category: 'CRYPTO' as MarketCategory,
     endDate: '',
     creationFee: '0.01'
   });
 
-  const categories = ['CRYPTO', 'DEFI', 'LAUNCH', 'AIRDROP', 'GOVERNANCE', 'MEME', 'DEGEN'];
+  const { 
+    createMarket, 
+    isCreating, 
+    isConnected, 
+    isOnFraxtal, 
+    switchToFraxtal,
+    creationFee 
+  } = useFraxtalMarkets();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Add Web3 integration later
-    console.log('Creating market:', formData);
-    alert('🚀 Market creation coming soon! Web3 integration in progress...');
+    
+    if (!isConnected) {
+      alert('Please connect your wallet first!');
+      return;
+    }
+
+    if (!formData.title || !formData.endDate) {
+      alert('Please fill in all required fields!');
+      return;
+    }
+
+    try {
+      const endDate = new Date(formData.endDate);
+      
+      const marketParams: CreateMarketParams = {
+        question: formData.title,
+        description: formData.description,
+        category: formData.category,
+        endDate: endDate
+      };
+
+      const tx = await createMarket(marketParams);
+      
+      if (tx) {
+        alert('🎉 Market created successfully on Fraxtal! Transaction: ' + tx.hash);
+        setFormData({
+          title: '',
+          description: '',
+          category: 'CRYPTO',
+          endDate: '',
+          creationFee: creationFee
+        });
+        setIsExpanded(false);
+      }
+    } catch (error: any) {
+      console.error('Market creation failed:', error);
+      alert('❌ Market creation failed: ' + (error.message || 'Unknown error'));
+    }
   };
 
   if (!isExpanded) {
@@ -137,10 +182,10 @@ export function CreateMarketFull() {
               </label>
               <select
                 value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value as MarketCategory })}
                 className="w-full px-4 py-3 bg-black-800 border border-black-600 rounded-lg text-white focus:border-orange-500 focus:outline-none transition-colors"
               >
-                {categories.map(cat => (
+                {MARKET_CATEGORIES.map((cat: MarketCategory) => (
                   <option key={cat} value={cat}>{cat}</option>
                 ))}
               </select>
@@ -169,7 +214,7 @@ export function CreateMarketFull() {
                 <span className="text-white font-semibold">Creation Fee</span>
               </div>
               <div className="text-right">
-                <div className="text-xl font-bold text-orange-400">{formData.creationFee} ETH</div>
+                <div className="text-xl font-bold text-orange-400">{creationFee} frxETH</div>
                 <div className="text-xs text-black-400">≈ $25.50 USD</div>
               </div>
             </div>
@@ -190,10 +235,14 @@ export function CreateMarketFull() {
             </Button>
             <Button
               type="submit"
-              className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold"
+              disabled={isCreating || !isConnected}
+              className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Zap className="w-4 h-4 mr-2" />
-              CREATE & PAY
+              {isCreating ? 'CREATING...' : 
+               !isConnected ? 'CONNECT WALLET' :
+               !isOnFraxtal ? 'SWITCH TO FRAXTAL' : 
+               'CREATE & PAY'}
             </Button>
           </div>
 
