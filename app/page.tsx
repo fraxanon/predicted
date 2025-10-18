@@ -352,7 +352,7 @@ function DashboardPage() {
                         <button
                           onClick={() => {
                             setShowAgentDropdown(false);
-                            window.location.href = '/prophet-dashboard';
+                            window.location.href = '/dashboard';
                           }}
                           className="w-full flex items-center p-3 rounded-lg bg-cyan-500/10 border border-cyan-500/30 hover:bg-cyan-500/20 transition-colors text-left"
                         >
