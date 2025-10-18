@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useAccount, useSignMessage } from 'wagmi';
-import { AutomatedInvestment } from './AutomatedInvestment';
 import { AgentSettings } from './AgentSettings';
 
 interface InterestCategory {
@@ -424,13 +423,21 @@ export function InterestOnboarding({ onComplete }: InterestOnboardingProps) {
               Our AI agents will analyze the markets and automatically invest your budget based on your interests and risk tolerance using x402 payments.
             </p>
 
-            <AutomatedInvestment 
-              totalBudget={investmentAmount}
-              onInvestmentComplete={(results) => {
-                console.log('Investment completed:', results);
-                setShowAgentSettings(true);
-              }}
-            />
+            <div className="bg-black-800 border border-black-700 rounded-lg p-6 mb-6">
+              <div className="text-center">
+                <div className="text-4xl mb-4">🤖</div>
+                <h3 className="text-xl font-bold text-white mb-2">AI Investment Ready</h3>
+                <p className="text-black-400 mb-4">
+                  Budget: ${investmentAmount.toFixed(2)} allocated for AI-powered market investments
+                </p>
+                <button
+                  onClick={() => setShowAgentSettings(true)}
+                  className="px-6 py-3 bg-accent-500 hover:bg-accent-600 text-black-950 font-bold rounded transition-colors"
+                >
+                  Configure AI Agents
+                </button>
+              </div>
+            </div>
 
             <div className="flex justify-between mt-8">
               <button
