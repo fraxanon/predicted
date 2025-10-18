@@ -316,22 +316,6 @@ function DashboardPage() {
                     <div className="p-4">
                       <h3 className="text-white font-semibold mb-3">AI Agents</h3>
                       <div className="space-y-2">
-                        {/* Twitter Market Scout */}
-                        <button
-                          onClick={() => {
-                            setShowAgentDropdown(false);
-                            setTimeout(() => {
-                              window.location.href = '/scout-dashboard';
-                            }, 100);
-                          }}
-                          className="w-full flex items-center p-3 rounded-lg bg-blue-500/10 border border-blue-500/30 hover:bg-blue-500/20 transition-colors text-left"
-                        >
-                          <div className="flex-1">
-                            <div className="text-blue-400 font-medium text-sm">🐦 Twitter Market Scout</div>
-                            <div className="text-gray-400 text-xs">AI agent that discovers trending topics and analyzes market potential</div>
-                          </div>
-                        </button>
-
                         {/* Fraxtal Market Forge */}
                         <button
                           onClick={() => {
@@ -360,7 +344,7 @@ function DashboardPage() {
                         >
                           <div className="flex-1">
                             <div className="text-purple-400 font-medium text-sm">🔮 Oracle Agent - "Seer"</div>
-                            <div className="text-gray-400 text-xs">Market discovery and outcome verification</div>
+                            <div className="text-gray-400 text-xs">Twitter market discovery and outcome verification</div>
                           </div>
                         </button>
 
