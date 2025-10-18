@@ -12,6 +12,8 @@
     "agents:start": "tsx agents/index.ts",
     "contracts:compile": "hardhat compile",
     "contracts:deploy": "hardhat run scripts/deploy.ts",
+    "contracts:deploy:fraxtal": "hardhat run scripts/deploy-fraxtal.js --network fraxtal",
+    "contracts:deploy:fraxtal-testnet": "hardhat run scripts/deploy-fraxtal.js --network fraxtalTestnet",
     "test": "jest",
     "type-check": "tsc --noEmit"
   },

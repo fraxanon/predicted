@@ -316,6 +316,38 @@ function DashboardPage() {
                     <div className="p-4">
                       <h3 className="text-white font-semibold mb-3">AI Agents</h3>
                       <div className="space-y-2">
+                        {/* Twitter Market Scout */}
+                        <button
+                          onClick={() => {
+                            setShowAgentDropdown(false);
+                            setTimeout(() => {
+                              window.location.href = '/scout-dashboard';
+                            }, 100);
+                          }}
+                          className="w-full flex items-center p-3 rounded-lg bg-blue-500/10 border border-blue-500/30 hover:bg-blue-500/20 transition-colors text-left"
+                        >
+                          <div className="flex-1">
+                            <div className="text-blue-400 font-medium text-sm">🐦 Twitter Market Scout</div>
+                            <div className="text-gray-400 text-xs">AI agent that discovers trending topics and analyzes market potential</div>
+                          </div>
+                        </button>
+
+                        {/* Fraxtal Market Forge */}
+                        <button
+                          onClick={() => {
+                            setShowAgentDropdown(false);
+                            setTimeout(() => {
+                              window.location.href = '/forge-dashboard';
+                            }, 100);
+                          }}
+                          className="w-full flex items-center p-3 rounded-lg bg-orange-500/10 border border-orange-500/30 hover:bg-orange-500/20 transition-colors text-left"
+                        >
+                          <div className="flex-1">
+                            <div className="text-orange-400 font-medium text-sm">⚒️ Fraxtal Market Forge</div>
+                            <div className="text-gray-400 text-xs">Deploy smart contract prediction markets on Fraxtal using frxUSD</div>
+                          </div>
+                        </button>
+
                         {/* Oracle Agent */}
                         <button
                           onClick={() => {
@@ -327,12 +359,26 @@ function DashboardPage() {
                           className="w-full flex items-center p-3 rounded-lg bg-purple-500/10 border border-purple-500/30 hover:bg-purple-500/20 transition-colors text-left"
                         >
                           <div className="flex-1">
-                            <div className="text-purple-400 font-medium text-sm">🔮 Oracle + Deployer - "Seer & Builder"</div>
-                            <div className="text-gray-400 text-xs">Market discovery and decentralized prediction market creation</div>
+                            <div className="text-purple-400 font-medium text-sm">🔮 Oracle Agent - "Seer"</div>
+                            <div className="text-gray-400 text-xs">Market discovery and outcome verification</div>
                           </div>
                         </button>
 
-                        {/* Analytics + Trading Agent */}
+                        {/* Analytics Agent */}
+                        <button
+                          onClick={() => {
+                            setShowAgentDropdown(false);
+                            window.location.href = '/prophet-dashboard';
+                          }}
+                          className="w-full flex items-center p-3 rounded-lg bg-cyan-500/10 border border-cyan-500/30 hover:bg-cyan-500/20 transition-colors text-left"
+                        >
+                          <div className="flex-1">
+                            <div className="text-cyan-400 font-medium text-sm">📊 Analytics Agent - "Prophet"</div>
+                            <div className="text-gray-400 text-xs">AI-powered market analysis and predictions</div>
+                          </div>
+                        </button>
+
+                        {/* Trading Agent */}
                         <button
                           onClick={() => {
                             setShowAgentDropdown(false);
@@ -341,8 +387,8 @@ function DashboardPage() {
                           className="w-full flex items-center p-3 rounded-lg bg-green-500/10 border border-green-500/30 hover:bg-green-500/20 transition-colors text-left"
                         >
                           <div className="flex-1">
-                            <div className="text-green-400 font-medium text-sm">📊💰 Analytics + Trading - "Prophet & Cashier"</div>
-                            <div className="text-gray-400 text-xs">AI market analysis and autonomous investment management</div>
+                            <div className="text-green-400 font-medium text-sm">💰 X402 Trading Agent - "Cashier"</div>
+                            <div className="text-gray-400 text-xs">Autonomous investment management using X402</div>
                           </div>
                         </button>
                       </div>
