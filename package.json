@@ -1,7 +1,7 @@
 {
   "name": "iq-predict",
   "version": "0.1.0",
-  "description": "Web3 News Prediction Market powered by IQ AI agents",
+  "description": "Decentralized prediction market platform built for Fraxtal L2 with smart contract deployment and comprehensive mock mode",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -61,15 +61,16 @@
     "node": ">=18.0.0"
   },
   "keywords": [
-    "web3",
     "prediction-market",
-    "ai-agents",
-    "iq-adk",
-    "iq-atp",
     "fraxtal",
-    "x402",
-    "hackathon"
+    "web3",
+    "defi",
+    "nextjs",
+    "typescript",
+    "smart-contracts",
+    "mock-mode",
+    "frxusd"
   ],
-  "author": "Your Name",
+  "author": "Fraxtal Prediction Market Team",
   "license": "MIT"
 }
