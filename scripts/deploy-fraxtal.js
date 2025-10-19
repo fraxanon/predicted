@@ -9,38 +9,45 @@ async function main() {
   console.log('Account balance:', (await deployer.getBalance()).toString());
 
   // Fraxtal configuration
-  const FRXUSD_ADDRESS = '0xfc00000000000000000000000000000000000001'; // Native frxUSD on Fraxtal
+  const network = await ethers.provider.getNetwork();
+  const isTestnet = network.chainId === 2522;
+  
+  // Use mock address for testnet, real address for mainnet
+  const FRXUSD_ADDRESS = isTestnet 
+    ? '0x0000000000000000000000000000000000000001' // Mock frxUSD for testnet
+    : '0xfc00000000000000000000000000000000000001'; // Real frxUSD on mainnet
+    
   const MARKET_CREATION_FEE = ethers.utils.parseEther('0.01'); // 0.01 frxETH
   const TRADING_FEE_BPS = 200; // 2%
 
-  // Deploy the PredictedMarketFactory contract
-  console.log('\n📋 Deploying PredictedMarketFactory...');
-  const PredictedMarketFactory = await ethers.getContractFactory('PredictedMarketFactory');
-  const marketFactory = await PredictedMarketFactory.deploy(
-    FRXUSD_ADDRESS,
+  // Deploy the SimpleMarketFactory contract (for testing)
+  console.log('\n📋 Deploying SimpleMarketFactory...');
+  const SimpleMarketFactory = await ethers.getContractFactory('SimpleMarketFactory');
+  const marketFactory = await SimpleMarketFactory.deploy(
     MARKET_CREATION_FEE,
     TRADING_FEE_BPS
   );
 
   await marketFactory.deployed();
-  console.log('✅ PredictedMarketFactory deployed to:', marketFactory.address);
+  console.log('✅ SimpleMarketFactory deployed to:', marketFactory.address);
 
   // Verify deployment
   console.log('\n🔍 Verifying deployment...');
   const creationFee = await marketFactory.marketCreationFee();
   const tradingFee = await marketFactory.tradingFeeBps();
-  const frxUSD = await marketFactory.frxUSD();
+  const owner = await marketFactory.owner();
   
   console.log('Creation Fee:', ethers.utils.formatEther(creationFee), 'frxETH');
   console.log('Trading Fee:', tradingFee.toString(), 'bps');
-  console.log('frxUSD Address:', frxUSD);
+  console.log('Owner:', owner);
+  console.log('Network:', isTestnet ? 'Fraxtal Testnet' : 'Fraxtal Mainnet');
 
   // Save deployment info
   const deploymentInfo = {
-    network: 'fraxtal',
-    chainId: 252,
+    network: isTestnet ? 'fraxtal-testnet' : 'fraxtal',
+    chainId: network.chainId,
     contracts: {
-      PredictedMarketFactory: {
+      SimpleMarketFactory: {
         address: marketFactory.address,
         deployer: deployer.address,
         deploymentBlock: marketFactory.deployTransaction.blockNumber,
@@ -48,7 +55,6 @@ async function main() {
       }
     },
     config: {
-      frxUSD: FRXUSD_ADDRESS,
       marketCreationFee: MARKET_CREATION_FEE.toString(),
       tradingFeeBps: TRADING_FEE_BPS
     },
