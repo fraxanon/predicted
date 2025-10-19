@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { useFraxtalMarkets } from '../../hooks/useFraxtalMarkets';
+import { useFraxtalMarkets } from '../../hooks/useFraxtalMarketsMock';
 import { CreateMarketFull } from '../../components/CreateMarket';
 
 export default function FraxtalMarketForge() {
@@ -12,56 +12,35 @@ export default function FraxtalMarketForge() {
     isOnFraxtal, 
     address, 
     config,
-    switchToFraxtal 
+    switchToFraxtal,
+    useMockData,
+    allMarkets,
+    userBalances,
+    userPortfolio
   } = useFraxtalMarkets();
 
-  // Mock data for forged markets
-  const forgedMarkets = [
-    {
-      id: 1,
-      question: "Will Bitcoin reach $100k by end of 2024?",
-      category: "CRYPTO",
-      status: "active",
-      volume: 15420,
-      participants: 234,
-      contractAddress: "0x1234...5678",
-      forgedAt: "2024-10-15T10:30:00Z",
-      frxUSDLocked: 12500,
-      yesPrice: 0.67,
-      noPrice: 0.33
-    },
-    {
-      id: 2,
-      question: "Will Fraxtal TVL exceed $1B this year?",
-      category: "DEFI",
-      status: "active",
-      volume: 8750,
-      participants: 156,
-      contractAddress: "0xabcd...efgh",
-      forgedAt: "2024-10-12T14:20:00Z",
-      frxUSDLocked: 7800,
-      yesPrice: 0.45,
-      noPrice: 0.55
-    },
-    {
-      id: 3,
-      question: "Will AI regulation pass in the US this year?",
-      category: "POLITICS",
-      status: "resolved",
-      volume: 12300,
-      participants: 189,
-      contractAddress: "0x9876...5432",
-      forgedAt: "2024-10-10T09:15:00Z",
-      frxUSDLocked: 0,
-      outcome: "YES"
-    }
-  ];
+  // Use dynamic market data from hook (mock or real)
+  const forgedMarkets = allMarkets.map(market => ({
+    id: market.id,
+    question: market.question,
+    category: market.category,
+    status: market.resolved ? "resolved" : "active",
+    volume: parseFloat(market.totalVolume),
+    participants: market.participants || 0,
+    contractAddress: `${market.creator.slice(0, 6)}...${market.creator.slice(-4)}`,
+    forgedAt: new Date(market.createdAt * 1000).toISOString(),
+    frxUSDLocked: market.resolved ? 0 : parseFloat(market.totalVolume) * 0.8, // Estimate locked amount
+    yesPrice: market.yesPrice || 0.5,
+    noPrice: market.noPrice || 0.5,
+    outcome: market.resolved ? (market.outcome === 1 ? "YES" : "NO") : undefined
+  }));
 
+  // Calculate dynamic forge stats
   const forgeStats = {
-    totalMarkets: 47,
-    activeMarkets: 23,
-    totalVolume: 2847392,
-    frxUSDLocked: 1234567,
+    totalMarkets: allMarkets.length,
+    activeMarkets: allMarkets.filter(m => !m.resolved).length,
+    totalVolume: allMarkets.reduce((sum, m) => sum + parseFloat(m.totalVolume), 0),
+    frxUSDLocked: allMarkets.filter(m => !m.resolved).reduce((sum, m) => sum + parseFloat(m.totalVolume) * 0.8, 0),
     successRate: 94.7,
     avgCreationTime: "2.3s",
     gasOptimization: "87%"
@@ -89,7 +68,9 @@ export default function FraxtalMarketForge() {
                 className="text-right"
               >
                 <div className="text-white text-sm font-medium">Portfolio</div>
-                <div className="text-accent-500 text-xs">$6,227.88</div>
+                <div className="text-accent-500 text-xs">
+                  ${userPortfolio?.totalValue?.toFixed(2) || userBalances?.frxUSD || '0.00'}
+                </div>
               </a>
               <ConnectButton 
                 chainStatus="icon"
@@ -136,8 +117,20 @@ export default function FraxtalMarketForge() {
             <p className="text-black-400 text-sm hidden md:block">Deploy smart contract prediction markets on Fraxtal using frxUSD</p>
           </div>
 
+          {/* Mock Mode Banner */}
+          {useMockData && (
+            <div className="mb-4 bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                <span className="text-blue-400 text-sm font-medium">
+                  🧪 Mock Mode Active - Using simulated data while waiting for testnet tokens
+                </span>
+              </div>
+            </div>
+          )}
+
           {/* Network Status Banner */}
-          {isConnected && !isOnFraxtal && (
+          {isConnected && !isOnFraxtal && !useMockData && (
             <div className="mb-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -313,28 +306,36 @@ export default function FraxtalMarketForge() {
             {/* Sidebar */}
             <div className="lg:col-span-4 space-y-3 md:space-y-4">
               
-              {/* Forge Status */}
+              {/* Wallet Status */}
               <div className="bg-black-800 border border-black-700 p-3 md:p-4">
-                <h3 className="text-white font-bold mb-3">⚒️ Forge Status</h3>
+                <h3 className="text-white font-bold mb-3">💰 Wallet Status</h3>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-black-400 text-sm">Network</span>
                     <div className="flex items-center gap-2">
                       <div className={`w-2 h-2 rounded-full ${isOnFraxtal ? 'bg-green-400' : 'bg-red-400'}`}></div>
                       <span className="text-white text-sm">
-                        {isOnFraxtal ? 'Fraxtal' : 'Wrong Network'}
+                        {useMockData ? 'Mock Mode' : isOnFraxtal ? 'Fraxtal' : 'Wrong Network'}
                       </span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-black-400 text-sm">Wallet</span>
+                    <span className="text-black-400 text-sm">Connection</span>
                     <span className="text-white text-sm">
                       {isConnected ? 'Connected' : 'Disconnected'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-black-400 text-sm">Factory Contract</span>
-                    <span className="text-green-400 text-sm">Deployed</span>
+                    <span className="text-black-400 text-sm">frxUSD Balance</span>
+                    <span className="text-green-400 text-sm font-medium">
+                      ${userBalances?.frxUSD || '0.00'}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-black-400 text-sm">frxETH Balance</span>
+                    <span className="text-blue-400 text-sm font-medium">
+                      {userBalances?.frxETH || '0.0000'} frxETH
+                    </span>
                   </div>
                 </div>
               </div>

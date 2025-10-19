@@ -1,3 +1,7 @@
+// Temporarily disabled due to ADK compatibility issues
+// This file will be re-enabled once ADK integration is properly configured
+
+/*
 import { AgentBuilder } from '@iqai/adk';
 import { TwitterSearchTool, TwitterSearchResult } from './tools/TwitterSearchTool';
 import { MarketAnalysisTool, MarketAnalysis } from './tools/MarketAnalysisTool';
@@ -17,15 +21,9 @@ export class TwitterMarketScout {
   private analysisTool: MarketAnalysisTool;
 
   constructor() {
-    // Initialize tools with proper config - BaseTool requires name and description
-    this.twitterTool = new TwitterSearchTool({
-      name: 'twitter_search',
-      description: 'Search Twitter for trending topics and news that could become prediction markets'
-    });
-    this.analysisTool = new MarketAnalysisTool({
-      name: 'analyze_market_potential', 
-      description: 'Analyze Twitter content to determine prediction market viability and generate market questions'
-    });
+    // Initialize tools - they have default names and descriptions
+    this.twitterTool = new TwitterSearchTool();
+    this.analysisTool = new MarketAnalysisTool();
   }
 
   async initialize(apiKey?: string) {
@@ -225,3 +223,4 @@ ${index + 1}. ${rec.question}
     return output;
   }
 }
+*/

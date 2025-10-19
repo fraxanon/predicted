@@ -1,12 +1,21 @@
-// Custom tool interface to avoid ADK ESM issues
+// BaseTool interface compatible with ADK
 interface ToolConfig {
   name: string;
   description: string;
 }
 
-abstract class CustomTool {
+abstract class BaseTool {
   name: string;
   description: string;
+  isLongRunning: boolean = false;
+  shouldRetryOnFailure: boolean = true;
+  maxRetryAttempts: number = 3;
+  baseRetryDelay: number = 1000;
+  maxRetryDelay: number = 10000;
+  retryBackoffFactor: number = 2;
+  timeout: number = 30000;
+  requiresConfirmation: boolean = false;
+  confirmationMessage?: string;
   
   constructor(config: ToolConfig) {
     this.name = config.name;
@@ -31,9 +40,13 @@ export interface TwitterSearchResult {
   suggestedMarketQuestion: string;
 }
 
-export class TwitterSearchTool extends CustomTool {
-  name = 'twitter_search';
-  description = 'Search Twitter for trending topics and news that could become prediction markets';
+export class TwitterSearchTool extends BaseTool {
+  constructor(config?: ToolConfig) {
+    super(config || {
+      name: 'twitter_search',
+      description: 'Search Twitter for trending topics and news that could become prediction markets'
+    });
+  }
 
   schema = {
     type: 'object',

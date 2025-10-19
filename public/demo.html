@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fraxtal Prediction Market - Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { 
+            background: #0a0a0a; 
+            color: white; 
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="border-b border-gray-800 bg-black">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-8">
+                    <a href="#" class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-white flex items-center justify-center">
+                            <span class="text-black font-bold text-sm">[P]</span>
+                        </div>
+                        <span class="text-xs bg-orange-500 text-black px-1 py-0.5 font-bold">🇺🇸</span>
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-right">
+                        <div class="text-white text-sm font-medium">Portfolio</div>
+                        <div class="text-orange-500 text-xs">$6,227.88</div>
+                    </div>
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                        Connect Wallet
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="border-b border-gray-800 bg-black">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-12">
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">Markets</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">Docs</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">Treasury</a>
+                    <span class="text-orange-500 text-sm font-medium border-b-2 border-orange-500 pb-3">
+                        Fraxtal Market Forge
+                    </span>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">Portfolio</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="bg-black min-h-screen p-4">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header -->
+            <div class="mb-6">
+                <h1 class="text-3xl font-bold text-white mb-2">⚒️ Fraxtal Market Forge</h1>
+                <p class="text-gray-400 text-lg">Deploy smart contract prediction markets on Fraxtal using frxUSD</p>
+            </div>
+
+            <!-- Mock Mode Banner -->
+            <div class="mb-6 bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
+                    <span class="text-blue-400 font-medium">
+                        🧪 Mock Mode Active - Using simulated data while waiting for testnet tokens
+                    </span>
+                </div>
+            </div>
+
+            <!-- Demo Content -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Main Content -->
+                <div class="lg:col-span-8 space-y-6">
+                    <!-- Market Creation Demo -->
+                    <div class="gradient-bg border border-gray-700 rounded-lg p-6">
+                        <h2 class="text-xl font-bold text-white mb-4">🔥 Create Prediction Market</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Market Question</label>
+                                <input type="text" 
+                                       placeholder="Will Bitcoin reach $100k by end of 2024?"
+                                       class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none">
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">Category</label>
+                                    <select class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-orange-500 focus:outline-none">
+                                        <option>CRYPTO</option>
+                                        <option>DEFI</option>
+                                        <option>TECH</option>
+                                        <option>POLITICS</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">End Date</label>
+                                    <input type="date" 
+                                           class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-orange-500 focus:outline-none">
+                                </div>
+                            </div>
+                            <button class="w-full bg-orange-500 hover:bg-orange-600 text-black font-bold py-3 px-6 rounded-lg transition-colors">
+                                ⚒️ Forge Market (0.01 frxETH)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sample Markets -->
+                    <div class="gradient-bg border border-gray-700 rounded-lg p-6">
+                        <h3 class="text-lg font-bold text-white mb-4">📋 Sample Markets</h3>
+                        <div class="space-y-4">
+                            <div class="bg-gray-800 border border-gray-700 rounded-lg p-4">
+                                <h4 class="text-white font-medium mb-2">Will Bitcoin reach $100k by end of 2024?</h4>
+                                <div class="flex items-center gap-4 text-sm text-gray-400 mb-3">
+                                    <span class="bg-blue-500/20 text-blue-400 px-2 py-1 rounded">CRYPTO</span>
+                                    <span>234 participants</span>
+                                    <span>$15,420 volume</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <button class="bg-green-600/20 border border-green-600 text-green-400 py-2 px-4 rounded font-medium">
+                                        YES $0.72
+                                    </button>
+                                    <button class="bg-red-600/20 border border-red-600 text-red-400 py-2 px-4 rounded font-medium">
+                                        NO $0.28
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-800 border border-gray-700 rounded-lg p-4">
+                                <h4 class="text-white font-medium mb-2">Will Fraxtal TVL exceed $1B this year?</h4>
+                                <div class="flex items-center gap-4 text-sm text-gray-400 mb-3">
+                                    <span class="bg-purple-500/20 text-purple-400 px-2 py-1 rounded">DEFI</span>
+                                    <span>156 participants</span>
+                                    <span>$8,750 volume</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <button class="bg-green-600/20 border border-green-600 text-green-400 py-2 px-4 rounded font-medium">
+                                        YES $0.45
+                                    </button>
+                                    <button class="bg-red-600/20 border border-red-600 text-red-400 py-2 px-4 rounded font-medium">
+                                        NO $0.55
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="lg:col-span-4 space-y-6">
+                    <!-- Wallet Status -->
+                    <div class="gradient-bg border border-gray-700 rounded-lg p-6">
+                        <h3 class="text-white font-bold mb-4">💰 Wallet Status</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-400 text-sm">Network</span>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                                    <span class="text-white text-sm">Mock Mode</span>
+                                </div>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400 text-sm">Connection</span>
+                                <span class="text-white text-sm">Connected</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400 text-sm">frxUSD Balance</span>
+                                <span class="text-green-400 text-sm font-medium">$2,847.50</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400 text-sm">frxETH Balance</span>
+                                <span class="text-blue-400 text-sm font-medium">1.2345 frxETH</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="gradient-bg border border-gray-700 rounded-lg p-6">
+                        <h3 class="text-white font-bold mb-4">📊 Quick Stats</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-400 text-sm">Markets Forged</span>
+                                <span class="text-white text-sm font-medium">5</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400 text-sm">Total Volume</span>
+                                <span class="text-white text-sm font-medium">$42.8K</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400 text-sm">frxUSD Locked</span>
+                                <span class="text-white text-sm font-medium">$34.2K</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400 text-sm">Success Rate</span>
+                                <span class="text-green-400 text-sm font-medium">94.7%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Features -->
+                    <div class="gradient-bg border border-gray-700 rounded-lg p-6">
+                        <h3 class="text-white font-bold mb-4">✨ Features</h3>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex items-center gap-2">
+                                <span class="text-green-400">✓</span>
+                                <span class="text-gray-300">Smart Contract Markets</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-green-400">✓</span>
+                                <span class="text-gray-300">frxUSD Native Trading</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-green-400">✓</span>
+                                <span class="text-gray-300">Gas Optimized</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-green-400">✓</span>
+                                <span class="text-gray-300">Mock Mode Testing</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-blue-400">🔄</span>
+                                <span class="text-gray-300">AI Market Scouting</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="mt-12 text-center text-gray-500 text-sm">
+                <p>🚀 Fraxtal Prediction Market - Built with Next.js, Tailwind CSS, and Mock Data</p>
+                <p class="mt-2">Ready for testnet deployment when tokens are available!</p>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

@@ -1,4 +1,5 @@
 const { ethers } = require('hardhat');
+const { formatEther, parseEther } = require('ethers');
 
 async function main() {
   console.log('🔥 Deploying Predicted Market Factory to Fraxtal...');
@@ -6,7 +7,10 @@ async function main() {
   // Get the deployer account
   const [deployer] = await ethers.getSigners();
   console.log('Deploying contracts with account:', deployer.address);
-  console.log('Account balance:', (await deployer.getBalance()).toString());
+  
+  // Get balance using provider
+  const balance = await ethers.provider.getBalance(deployer.address);
+  console.log('Account balance:', formatEther(balance), 'frxETH');
 
   // Fraxtal configuration
   const network = await ethers.provider.getNetwork();
@@ -17,7 +21,7 @@ async function main() {
     ? '0x0000000000000000000000000000000000000001' // Mock frxUSD for testnet
     : '0xfc00000000000000000000000000000000000001'; // Real frxUSD on mainnet
     
-  const MARKET_CREATION_FEE = ethers.utils.parseEther('0.01'); // 0.01 frxETH
+  const MARKET_CREATION_FEE = parseEther('0.01'); // 0.01 frxETH
   const TRADING_FEE_BPS = 200; // 2%
 
   // Deploy the SimpleMarketFactory contract (for testing)
@@ -37,7 +41,7 @@ async function main() {
   const tradingFee = await marketFactory.tradingFeeBps();
   const owner = await marketFactory.owner();
   
-  console.log('Creation Fee:', ethers.utils.formatEther(creationFee), 'frxETH');
+  console.log('Creation Fee:', formatEther(creationFee), 'frxETH');
   console.log('Trading Fee:', tradingFee.toString(), 'bps');
   console.log('Owner:', owner);
   console.log('Network:', isTestnet ? 'Fraxtal Testnet' : 'Fraxtal Mainnet');

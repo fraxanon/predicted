@@ -41,8 +41,8 @@ export default function CashierDashboard() {
 
   const totalInvested = tradingHistory.reduce((sum, trade) => sum + trade.amount, 0);
   const totalReturns = tradingHistory.reduce((sum, trade) => {
-    if (trade.status === 'won') return sum + trade.payout;
-    if (trade.status === 'active') return sum + trade.currentValue;
+    if (trade.status === 'won') return sum + (trade.payout || 0);
+    if (trade.status === 'active') return sum + (trade.currentValue || 0);
     return sum;
   }, 0);
   const profitLoss = totalReturns - totalInvested;
