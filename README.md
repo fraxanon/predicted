@@ -2,6 +2,8 @@
 
 A decentralized prediction market platform built for Fraxtal L2, featuring smart contract deployment, mock mode for development, and comprehensive trading functionality.
 
+> **Live at**: [predicted.web3](https://predicted.web3) 🌐
+
 ## 🎯 What This App Does
 
 **Fraxtal Prediction Market** is a full-featured prediction market platform that allows users to:
@@ -12,6 +14,8 @@ A decentralized prediction market platform built for Fraxtal L2, featuring smart
 - **📊 Portfolio Management** - Track positions, P&L, and transaction history  
 - **🏛️ Treasury Dashboard** - Platform governance and fee management
 - **📈 Market Analytics** - Volume, participants, and price history
+- **🤖 AI Agents** - Twitter Market Scout for trend analysis and market discovery
+- **🎯 Personalized Recommendations** - AI-powered investment suggestions
 - **🧪 Mock Mode** - Full functionality without testnet tokens (current state)
 
 ### Technical Architecture 🏗️
@@ -23,8 +27,13 @@ A decentralized prediction market platform built for Fraxtal L2, featuring smart
 - **Styling**: Custom dark theme with orange accents
 
 ### Live Demo 🌐
-- **Full App**: https://predicted-glq2hpplo-eros-6531s-projects.vercel.app
-- **Static Demo**: https://fraxtal-market-demo-26115735.surge.sh
+- **Production App**: https://predicted.web3 (Custom Web3 Domain)
+- **Fallback URL**: https://predicted-8tlwgqxtm-eros-6531s-projects.vercel.app
+- **Dashboard Interface**: Original dashboard-style landing page with markets
+- **Platform**: Vercel with native Next.js support and serverless functions
+- **Full-Stack Features**: API routes, agent integration, serverless functions
+- **Mock Mode Enabled**: Complete functionality without testnet tokens
+- **Web3 Domain**: Powered by Unstoppable Domains
 
 ## 🚀 Getting Started
 
@@ -50,6 +59,32 @@ npm run dev
 ```
 
 Visit `http://localhost:3000` to see the app running with mock data!
+
+## 🤖 AI Agent Features
+
+### Twitter Market Scout
+The app includes an AI-powered Twitter Market Scout that analyzes social media trends to discover potential prediction markets:
+
+#### API Endpoints:
+- **POST `/api/scout-markets`** - Run full market scouting across multiple topics
+- **GET `/api/scout-markets?topic=<topic>`** - Analyze specific topic
+- **POST `/api/scout-markets-simple`** - Simplified scout without external dependencies
+
+#### Example Usage:
+```bash
+# Scout for crypto, AI, and tech markets
+curl -X POST https://predicted-8tlwgqxtm-eros-6531s-projects.vercel.app/api/scout-markets-simple \
+  -H "Content-Type: application/json" \
+  -d '{"queries": ["crypto", "AI", "bitcoin"], "maxResults": 5}'
+
+# Analyze specific topic
+curl "https://predicted-8tlwgqxtm-eros-6531s-projects.vercel.app/api/scout-markets-simple?topic=ethereum"
+```
+
+### Personalized Recommendations
+- **POST `/api/agents/recommendations`** - Generate AI-powered investment recommendations
+- Analyzes user profile (interests, risk tolerance, investment amount)
+- Returns scored market recommendations with reasoning
 
 ## 🚧 Current Status & Blockers
 
