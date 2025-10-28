@@ -1,4 +1,5 @@
-import { BaseAgent, ATP } from "../../lib/mock-agents";
+import { AgentBuilder } from '@iqai/adk';
+import { ATP } from "../../lib/mock-agents";
 import axios from "axios";
 
 export interface Web3Event {
@@ -15,7 +16,7 @@ export interface Web3Event {
 }
 
 /**
- * Oracle Agent - Powered by IQ ATP
+ * Oracle Agent - Powered by IQ ADK + ATP
  * 
  * Responsibilities:
  * - Scrape trusted Web3 news sources
@@ -23,13 +24,15 @@ export interface Web3Event {
  * - Emit new prediction-worthy events
  * - Resolve completed events
  */
-export class OracleAgent extends BaseAgent {
+export class OracleAgent {
+  private agent: any;
+  private runner: any;
+  private session: any;
   private atp: ATP;
   private dataSources: string[];
   private processedEvents: Set<string>;
 
   constructor() {
-    super('oracle-agent');
     
     this.atp = new ATP({
       apiKey: process.env.IQ_ATP_API_KEY,
@@ -42,6 +45,35 @@ export class OracleAgent extends BaseAgent {
     ];
 
     this.processedEvents = new Set();
+  }
+
+  async initialize() {
+    const { agent, runner, session } = await AgentBuilder
+      .create('oracle_agent')
+      .withModel('gpt-4o-mini')
+      .withDescription('AI agent that discovers and validates Web3 events for prediction markets')
+      .withInstruction(`
+        You are an Oracle Agent specialized in Web3 event discovery and validation.
+        
+        Your responsibilities:
+        1. Scrape trusted Web3 news sources
+        2. Validate and classify events using AI
+        3. Emit new prediction-worthy events
+        4. Resolve completed events
+        
+        Focus on:
+        - Accurate event detection and classification
+        - Reliable source validation
+        - Clear resolution criteria
+        - Timely event resolution
+      `)
+      .build();
+
+    this.agent = agent;
+    this.runner = runner;
+    this.session = session;
+    
+    return { agent, runner, session };
   }
 
   async run() {
@@ -76,7 +108,7 @@ export class OracleAgent extends BaseAgent {
           
           if (event && event.confidence > 0.7) {
             this.processedEvents.add(article.id);
-            this.emit('newWeb3Event', event);
+            console.log('🔔 New Web3 event detected:', event.title);
           }
         }
       } catch (error) {
@@ -182,19 +214,24 @@ export class OracleAgent extends BaseAgent {
   }
 
   /**
-   * Handle incoming events
+   * Check for events from external request
    */
-  protected async handleEvent(eventType: string, data: any) {
-    switch (eventType) {
-      case 'checkForEvents':
-        await this.checkForEvents();
-        break;
-      case 'resolveEvent':
-        await this.resolveEvent(data);
-        break;
-      default:
-        console.log(`🔍 Oracle Agent: Unknown event type: ${eventType}`);
-    }
+  public async checkForEventsFromRequest() {
+    return await this.checkForEvents();
+  }
+
+  /**
+   * Resolve event from external request
+   */
+  public async resolveEventFromRequest(eventData: any) {
+    return await this.resolveEvent(eventData);
+  }
+
+  /**
+   * Get processed events
+   */
+  public getProcessedEvents(): string[] {
+    return Array.from(this.processedEvents);
   }
 
   /**
@@ -224,7 +261,7 @@ export class OracleAgent extends BaseAgent {
 
       const resolution = JSON.parse(response.content);
       
-      this.emit('eventResolved', {
+      console.log('✅ Event resolved:', {
         eventId: eventData.id,
         outcome: resolution.outcome,
         confidence: resolution.confidence,

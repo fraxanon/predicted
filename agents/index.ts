@@ -1,34 +1,26 @@
+// Re-export the new ADK-based system
+export { default as IQPredictADK, IQPredictADKSystem } from './index-adk';
+
+// For backward compatibility, also export the old mock system
 import { AgentSystem } from "../lib/mock-agents";
-import { OracleAgent } from "./oracle/OracleAgent";
-import { PredictionMarketAgent } from "./prediction/PredictionMarketAgent";
-import { BettingAgent } from "./betting/BettingAgent";
-import { AnalyticsAgent } from "./analytics/AnalyticsAgent";
 import dotenv from "dotenv";
 
 // Load environment variables
 dotenv.config();
 
 /**
- * IQ Predict Multi-Agent System
+ * IQ Predict Multi-Agent System (Legacy Mock Version)
  * 
- * Orchestrates four specialized agents:
- * 1. Oracle Agent - Scrapes and validates Web3 news
- * 2. Prediction Market Agent - Creates and manages markets
- * 3. Betting Agent - Handles payments and payouts
- * 4. Analytics Agent - Provides AI predictions
+ * This is kept for backward compatibility.
+ * Use IQPredictADKSystem for the full ADK implementation.
  */
-class IQPredictSystem {
+class IQPredictLegacySystem {
   private agentSystem: AgentSystem;
 
   constructor() {
-    // Initialize the multi-agent system
+    // Initialize the mock agent system (legacy)
     this.agentSystem = new AgentSystem({
-      agents: [
-        new OracleAgent(),
-        new PredictionMarketAgent(),
-        new BettingAgent(),
-        new AnalyticsAgent(),
-      ],
+      agents: [],
       config: {
         apiKey: process.env.IQ_ADK_API_KEY,
         environment: process.env.NODE_ENV || 'development',
@@ -113,21 +105,24 @@ class IQPredictSystem {
   }
 }
 
-// Initialize and start the system
-const iqPredict = new IQPredictSystem();
+// Initialize and start the legacy system
+const iqPredictLegacy = new IQPredictLegacySystem();
 
 // Handle graceful shutdown
 process.on('SIGINT', async () => {
-  await iqPredict.stop();
+  await iqPredictLegacy.stop();
   process.exit(0);
 });
 
 process.on('SIGTERM', async () => {
-  await iqPredict.stop();
+  await iqPredictLegacy.stop();
   process.exit(0);
 });
 
-// Start the system
-iqPredict.start().catch(console.error);
+// Start the legacy system only if this file is run directly
+if (require.main === module) {
+  iqPredictLegacy.start().catch(console.error);
+}
 
-export default iqPredict;
+export default iqPredictLegacy;
+export { IQPredictLegacySystem };

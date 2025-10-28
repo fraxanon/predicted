@@ -1,4 +1,5 @@
-import { BaseAgent, X402 } from "../../lib/mock-agents";
+import { AgentBuilder } from '@iqai/adk';
+import { X402 } from "../../lib/mock-agents";
 import { ethers } from "ethers";
 
 export interface Bet {
@@ -32,7 +33,10 @@ export interface Payout {
  * - Process payouts when markets resolve
  * - Track betting history and statistics
  */
-export class BettingAgent extends BaseAgent {
+export class BettingAgent {
+  private agent: any;
+  private runner: any;
+  private session: any;
   private x402: X402;
   private provider: ethers.JsonRpcProvider;
   private wallet: ethers.Wallet;
@@ -40,7 +44,6 @@ export class BettingAgent extends BaseAgent {
   private pendingPayouts: Map<string, Payout>;
 
   constructor() {
-    super('betting-agent');
     
     // Initialize Coinbase x402
     this.x402 = new X402({
@@ -61,6 +64,35 @@ export class BettingAgent extends BaseAgent {
 
     this.activeBets = new Map();
     this.pendingPayouts = new Map();
+  }
+
+  async initialize() {
+    const { agent, runner, session } = await AgentBuilder
+      .create('betting_agent')
+      .withModel('gpt-4o-mini')
+      .withDescription('AI agent that handles betting operations and payouts for prediction markets')
+      .withInstruction(`
+        You are a Betting Agent specialized in managing prediction market betting operations.
+        
+        Your responsibilities:
+        1. Handle user bet placement via x402 payments
+        2. Manage bet execution on smart contracts
+        3. Process payouts when markets resolve
+        4. Track betting history and statistics
+        
+        Focus on:
+        - Secure payment processing with x402
+        - Accurate bet execution on Fraxtal L2
+        - Fair payout distribution
+        - Comprehensive betting analytics
+      `)
+      .build();
+
+    this.agent = agent;
+    this.runner = runner;
+    this.session = session;
+    
+    return { agent, runner, session };
   }
 
   async run() {
@@ -158,8 +190,8 @@ export class BettingAgent extends BaseAgent {
 
       console.log('🎯 Bet executed on-chain:', txHash);
 
-      // Emit bet confirmed event
-      this.emit('betConfirmed', bet);
+      // Log bet confirmed event
+      console.log('✅ Bet confirmed event:', bet.id);
 
     } catch (error) {
       console.error('❌ Failed to execute bet on-chain:', error);
@@ -266,8 +298,8 @@ export class BettingAgent extends BaseAgent {
       
       console.log('✅ Payout completed:', txHash);
       
-      // Emit payout completed event
-      this.emit('payoutCompleted', payout);
+      // Log payout completed event
+      console.log('✅ Payout completed event:', payout.id);
 
     } catch (error) {
       console.error('❌ Failed to execute payout:', error);
@@ -348,21 +380,23 @@ export class BettingAgent extends BaseAgent {
   }
 
   /**
-   * Handle incoming events
+   * Process a bet from external request
    */
-  protected async handleEvent(eventType: string, data: any) {
-    switch (eventType) {
-      case 'processBet':
-        await this.processBet(data);
-        break;
-      case 'paymentSuccess':
-        await this.handlePaymentSuccess(data);
-        break;
-      case 'distributePayout':
-        await this.distributePayout(data);
-        break;
-      default:
-        console.log(`💰 Betting Agent: Unknown event type: ${eventType}`);
-    }
+  public async processBetFromEvent(betData: any): Promise<string> {
+    return await this.processBet(betData);
+  }
+
+  /**
+   * Handle payment success from external request
+   */
+  public async handlePaymentSuccessFromEvent(paymentData: any) {
+    return await this.handlePaymentSuccess(paymentData);
+  }
+
+  /**
+   * Distribute payout from external request
+   */
+  public async distributePayoutFromEvent(resolutionData: any) {
+    return await this.distributePayout(resolutionData);
   }
 }

@@ -2,6 +2,10 @@
 
 An AI agent built with IQ ADK-TS that searches Twitter for trending topics and analyzes their potential as prediction markets.
 
+## ✅ ADK Integration Status: ACTIVE
+
+The TwitterMarketScout is now fully integrated with the @iqai/adk framework and ready for hackathon use!
+
 ## Overview
 
 The Twitter Market Scout Agent uses the IQ Agent Development Kit (ADK-TS) to:

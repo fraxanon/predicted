@@ -1,4 +1,4 @@
-import { BaseAgent } from "../../lib/mock-agents";
+import { AgentBuilder } from '@iqai/adk';
 import { ethers } from "ethers";
 import { Web3Event } from "../oracle/OracleAgent";
 
@@ -27,14 +27,15 @@ export interface PredictionMarket {
  * - Manage market state and liquidity
  * - Handle market resolution
  */
-export class PredictionMarketAgent extends BaseAgent {
+export class PredictionMarketAgent {
+  private agent: any;
+  private runner: any;
+  private session: any;
   private provider: ethers.JsonRpcProvider;
   private wallet: ethers.Wallet;
   private activeMarkets: Map<string, PredictionMarket>;
 
   constructor() {
-    super('prediction-market-agent');
-    
     // Initialize Fraxtal L2 connection
     this.provider = new ethers.JsonRpcProvider(
       process.env.FRAXTAL_RPC_URL || 'https://rpc.frax.com'
@@ -46,6 +47,35 @@ export class PredictionMarketAgent extends BaseAgent {
     );
 
     this.activeMarkets = new Map();
+  }
+
+  async initialize() {
+    const { agent, runner, session } = await AgentBuilder
+      .create('prediction_market_agent')
+      .withModel('gpt-4o-mini')
+      .withDescription('AI agent that creates and manages prediction markets on Fraxtal L2')
+      .withInstruction(`
+        You are a Prediction Market Agent specialized in creating and managing decentralized prediction markets.
+        
+        Your responsibilities:
+        1. Create new prediction markets from Oracle events
+        2. Deploy smart contracts on Fraxtal L2
+        3. Manage market state and liquidity
+        4. Handle market resolution when events conclude
+        
+        Focus on:
+        - Accurate market deployment and management
+        - Fair resolution based on Oracle data
+        - Efficient gas usage on Fraxtal L2
+        - User-friendly market interfaces
+      `)
+      .build();
+
+    this.agent = agent;
+    this.runner = runner;
+    this.session = session;
+    
+    return { agent, runner, session };
   }
 
   async run() {
@@ -90,8 +120,8 @@ export class PredictionMarketAgent extends BaseAgent {
 
       this.activeMarkets.set(market.id, market);
       
-      // Emit market created event
-      this.emit('marketCreated', market);
+      // Log market created event
+      console.log('✅ Market created event:', market.id);
       
       console.log('✅ Market created:', market.id);
       return market;
@@ -126,7 +156,7 @@ export class PredictionMarketAgent extends BaseAgent {
         // Check if market has ended
         if (new Date() > market.endDate && !market.resolved) {
           console.log('⏰ Market ended, awaiting resolution:', marketId);
-          this.emit('marketEnded', market);
+          console.log('⏰ Market ended event:', market.id);
         }
 
         // Update market data from blockchain
@@ -181,8 +211,8 @@ export class PredictionMarketAgent extends BaseAgent {
       market.resolved = true;
       market.outcome = resolutionData.outcome;
       
-      // Emit resolution event
-      this.emit('marketResolved', {
+      // Log resolution event
+      console.log('✅ Market resolved event:', {
         marketId: market.id,
         outcome: resolutionData.outcome,
         totalPool: market.totalPool,
@@ -220,21 +250,16 @@ export class PredictionMarketAgent extends BaseAgent {
   }
 
   /**
-   * Handle incoming events
+   * Create a market from external request
    */
-  protected async handleEvent(eventType: string, data: any) {
-    switch (eventType) {
-      case 'createMarket':
-        await this.createMarket(data);
-        break;
-      case 'resolveMarket':
-        await this.resolveMarket(data);
-        break;
-      case 'marketEnded':
-        console.log('⏰ Market ended:', data.id);
-        break;
-      default:
-        console.log(`📊 Prediction Market Agent: Unknown event type: ${eventType}`);
-    }
+  public async createMarketFromEvent(eventData: Web3Event): Promise<PredictionMarket> {
+    return await this.createMarket(eventData);
+  }
+
+  /**
+   * Resolve a market from external request
+   */
+  public async resolveMarketFromEvent(resolutionData: any) {
+    return await this.resolveMarket(resolutionData);
   }
 }

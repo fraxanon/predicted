@@ -1,4 +1,5 @@
-import { BaseAgent, ATP } from "../../lib/mock-agents";
+import { AgentBuilder } from '@iqai/adk';
+import { ATP } from "../../lib/mock-agents";
 import { PredictionMarket } from "../prediction/PredictionMarketAgent";
 
 export interface MarketAnalysis {
@@ -20,7 +21,7 @@ export interface TrendAnalysis {
 }
 
 /**
- * Analytics Agent - Powered by IQ ATP
+ * Analytics Agent - Powered by IQ ADK + ATP
  * 
  * Responsibilities:
  * - Analyze prediction markets using AI
@@ -28,7 +29,10 @@ export interface TrendAnalysis {
  * - Track market trends and patterns
  * - Generate insights for users
  */
-export class AnalyticsAgent extends BaseAgent {
+export class AnalyticsAgent {
+  private agent: any;
+  private runner: any;
+  private session: any;
   private atp: ATP;
   private marketAnalyses: Map<string, MarketAnalysis>;
   private trendAnalyses: Map<string, TrendAnalysis>;
@@ -41,7 +45,6 @@ export class AnalyticsAgent extends BaseAgent {
   }>;
 
   constructor() {
-    super('analytics-agent');
     
     this.atp = new ATP({
       apiKey: process.env.IQ_ATP_API_KEY,
@@ -50,6 +53,35 @@ export class AnalyticsAgent extends BaseAgent {
     this.marketAnalyses = new Map();
     this.trendAnalyses = new Map();
     this.predictionHistory = [];
+  }
+
+  async initialize() {
+    const { agent, runner, session } = await AgentBuilder
+      .create('analytics_agent')
+      .withModel('gpt-4o-mini')
+      .withDescription('AI agent that analyzes prediction markets and provides insights using ATP')
+      .withInstruction(`
+        You are an Analytics Agent specialized in prediction market analysis and insights.
+        
+        Your responsibilities:
+        1. Analyze prediction markets using AI
+        2. Provide outcome predictions and confidence scores
+        3. Track market trends and patterns
+        4. Generate insights for users
+        
+        Focus on:
+        - Accurate market analysis using ATP
+        - Data-driven predictions and insights
+        - Trend identification across categories
+        - User-friendly analytics dashboards
+      `)
+      .build();
+
+    this.agent = agent;
+    this.runner = runner;
+    this.session = session;
+    
+    return { agent, runner, session };
   }
 
   async run() {
@@ -136,8 +168,8 @@ export class AnalyticsAgent extends BaseAgent {
 
       console.log('✅ Market analysis completed:', market.id, 'Prediction:', analysis.prediction);
       
-      // Emit analysis update
-      this.emit('analysisUpdated', marketAnalysis);
+      // Log analysis update
+      console.log('📊 Analysis updated event:', marketAnalysis.marketId);
       
       return marketAnalysis;
 
@@ -354,7 +386,7 @@ export class AnalyticsAgent extends BaseAgent {
 
       const insights = JSON.parse(response.content);
       
-      this.emit('insightsGenerated', insights);
+      console.log('💡 Insights generated event:', insights.length, 'insights');
       return insights;
 
     } catch (error) {
@@ -384,24 +416,30 @@ export class AnalyticsAgent extends BaseAgent {
   }
 
   /**
-   * Handle incoming events
+   * Analyze market from external request
    */
-  protected async handleEvent(eventType: string, data: any) {
-    switch (eventType) {
-      case 'analyzeMarket':
-        await this.analyzeMarket(data);
-        break;
-      case 'updatePredictions':
-        await this.updateMarketPredictions();
-        break;
-      case 'marketResolved':
-        await this.handleMarketResolution(data);
-        break;
-      case 'generateInsights':
-        await this.generateMarketInsights();
-        break;
-      default:
-        console.log(`📈 Analytics Agent: Unknown event type: ${eventType}`);
-    }
+  public async analyzeMarketFromEvent(market: PredictionMarket): Promise<MarketAnalysis> {
+    return await this.analyzeMarket(market);
+  }
+
+  /**
+   * Update predictions from external request
+   */
+  public async updatePredictionsFromEvent() {
+    return await this.updateMarketPredictions();
+  }
+
+  /**
+   * Handle market resolution from external request
+   */
+  public async handleMarketResolutionFromEvent(resolutionData: any) {
+    return await this.handleMarketResolution(resolutionData);
+  }
+
+  /**
+   * Generate insights from external request
+   */
+  public async generateInsightsFromEvent() {
+    return await this.generateMarketInsights();
   }
 }

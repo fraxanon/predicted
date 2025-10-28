@@ -16,15 +16,9 @@ export class TwitterMarketScoutSimple {
   private openaiApiKey: string | undefined;
 
   constructor() {
-    // Initialize tools with proper config
-    this.twitterTool = new TwitterSearchTool({
-      name: 'twitter_search',
-      description: 'Search Twitter for trending topics and news that could become prediction markets'
-    });
-    this.analysisTool = new MarketAnalysisTool({
-      name: 'analyze_market_potential', 
-      description: 'Analyze Twitter content to determine prediction market viability and generate market questions'
-    });
+    // Initialize tools 
+    this.twitterTool = new TwitterSearchTool();
+    this.analysisTool = new MarketAnalysisTool();
     
     this.openaiApiKey = process.env.OPENAI_API_KEY;
   }
