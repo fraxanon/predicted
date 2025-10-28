@@ -1,4 +1,4 @@
-import { BaseAgent, ATP } from "../../lib/mock-agents";
+import { AgentBuilder } from '@iqai/adk';
 import axios from "axios";
 
 export interface Web3Event {
@@ -15,7 +15,7 @@ export interface Web3Event {
 }
 
 /**
- * Oracle Agent - Powered by IQ ATP
+ * Oracle Agent - Powered by IQ ADK
  * 
  * Responsibilities:
  * - Scrape trusted Web3 news sources
@@ -23,18 +23,12 @@ export interface Web3Event {
  * - Emit new prediction-worthy events
  * - Resolve completed events
  */
-export class OracleAgent extends BaseAgent {
-  private atp: ATP;
+export class OracleAgent {
+  private agent: any;
   private dataSources: string[];
   private processedEvents: Set<string>;
 
   constructor() {
-    super('oracle-agent');
-    
-    this.atp = new ATP({
-      apiKey: process.env.IQ_ATP_API_KEY,
-    });
-
     this.dataSources = [
       'https://api.coindesk.com/v1/news',
       'https://api.cointelegraph.com/v1/news',
@@ -42,6 +36,33 @@ export class OracleAgent extends BaseAgent {
     ];
 
     this.processedEvents = new Set();
+  }
+
+  async initialize() {
+    const { agent } = await AgentBuilder
+      .create('oracle_agent')
+      .withModel('gpt-4o-mini')
+      .withDescription('Oracle agent for Web3 prediction markets')
+      .withInstruction(`
+        You are an oracle agent for Web3 prediction markets.
+        
+        Your responsibilities:
+        - Analyze Web3 news articles for prediction-worthy events
+        - Validate event authenticity and reliability
+        - Classify events into categories (airdrop, launch, listing, governance, defi, nft)
+        - Determine resolution criteria and timelines
+        - Resolve completed events with objective outcomes
+        
+        Always ensure:
+        - Events have clear, verifiable outcomes
+        - Proper timeline and deadline specification
+        - Reliable source validation
+        - Objective resolution criteria
+      `)
+      .build();
+    
+    this.agent = agent;
+    console.log('🔍 Oracle Agent initialized with ADK');
   }
 
   async run() {
@@ -76,7 +97,7 @@ export class OracleAgent extends BaseAgent {
           
           if (event && event.confidence > 0.7) {
             this.processedEvents.add(article.id);
-            this.emit('newWeb3Event', event);
+            console.log('🎆 New Web3 event discovered:', event.title);
           }
         }
       } catch (error) {
@@ -141,13 +162,8 @@ export class OracleAgent extends BaseAgent {
     `;
 
     try {
-      const response = await this.atp.analyze({
-        prompt,
-        model: 'gpt-4',
-        temperature: 0.1,
-      });
-
-      const analysis = JSON.parse(response.content);
+      const response = await this.agent.run(prompt);
+      const analysis = JSON.parse(response);
       
       if (!analysis.isPredictionWorthy) {
         return null;
@@ -182,19 +198,17 @@ export class OracleAgent extends BaseAgent {
   }
 
   /**
-   * Handle incoming events
+   * Check for events (public method for external calls)
    */
-  protected async handleEvent(eventType: string, data: any) {
-    switch (eventType) {
-      case 'checkForEvents':
-        await this.checkForEvents();
-        break;
-      case 'resolveEvent':
-        await this.resolveEvent(data);
-        break;
-      default:
-        console.log(`🔍 Oracle Agent: Unknown event type: ${eventType}`);
-    }
+  public async checkForEventsExternal() {
+    await this.checkForEvents();
+  }
+
+  /**
+   * Resolve an event (public method)
+   */
+  public async resolveEventExternal(eventData: any) {
+    await this.resolveEvent(eventData);
   }
 
   /**
@@ -216,15 +230,10 @@ export class OracleAgent extends BaseAgent {
     `;
 
     try {
-      const response = await this.atp.analyze({
-        prompt,
-        model: 'gpt-4',
-        temperature: 0.1,
-      });
-
-      const resolution = JSON.parse(response.content);
+      const response = await this.agent.run(prompt);
+      const resolution = JSON.parse(response);
       
-      this.emit('eventResolved', {
+      console.log('✅ Event resolved:', {
         eventId: eventData.id,
         outcome: resolution.outcome,
         confidence: resolution.confidence,

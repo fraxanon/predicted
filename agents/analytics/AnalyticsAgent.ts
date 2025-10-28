@@ -1,4 +1,4 @@
-import { BaseAgent, ATP } from "../../lib/mock-agents";
+import { AgentBuilder } from '@iqai/adk';
 import { PredictionMarket } from "../prediction/PredictionMarketAgent";
 
 export interface MarketAnalysis {
@@ -20,7 +20,7 @@ export interface TrendAnalysis {
 }
 
 /**
- * Analytics Agent - Powered by IQ ATP
+ * Analytics Agent - Powered by IQ ADK
  * 
  * Responsibilities:
  * - Analyze prediction markets using AI
@@ -28,8 +28,8 @@ export interface TrendAnalysis {
  * - Track market trends and patterns
  * - Generate insights for users
  */
-export class AnalyticsAgent extends BaseAgent {
-  private atp: ATP;
+export class AnalyticsAgent {
+  private agent: any;
   private marketAnalyses: Map<string, MarketAnalysis>;
   private trendAnalyses: Map<string, TrendAnalysis>;
   private predictionHistory: Array<{
@@ -41,15 +41,38 @@ export class AnalyticsAgent extends BaseAgent {
   }>;
 
   constructor() {
-    super('analytics-agent');
-    
-    this.atp = new ATP({
-      apiKey: process.env.IQ_ATP_API_KEY,
-    });
-
     this.marketAnalyses = new Map();
     this.trendAnalyses = new Map();
     this.predictionHistory = [];
+  }
+
+  async initialize() {
+    const { agent } = await AgentBuilder
+      .create('analytics_agent')
+      .withModel('gpt-4o-mini')
+      .withDescription('AI-powered analytics agent for Web3 prediction markets')
+      .withInstruction(`
+        You are an AI-powered analytics agent for Web3 prediction markets.
+        
+        Your responsibilities:
+        - Analyze prediction markets using AI
+        - Provide outcome predictions with confidence scores
+        - Track market trends and patterns across categories
+        - Generate actionable insights for users
+        
+        Categories you analyze: airdrop, launch, listing, governance, defi, nft
+        
+        Always provide structured analysis with:
+        - Clear predictions (yes/no)
+        - Confidence scores (0-1)
+        - Detailed reasoning
+        - Key factors influencing the outcome
+        - Risk assessment
+      `)
+      .build();
+    
+    this.agent = agent;
+    console.log('📈 Analytics Agent initialized with ADK');
   }
 
   async run() {
@@ -106,13 +129,8 @@ export class AnalyticsAgent extends BaseAgent {
     `;
 
     try {
-      const response = await this.atp.analyze({
-        prompt,
-        model: 'gpt-4',
-        temperature: 0.2,
-      });
-
-      const analysis = JSON.parse(response.content);
+      const response = await this.agent.run(prompt);
+      const analysis = JSON.parse(response);
       
       const marketAnalysis: MarketAnalysis = {
         marketId: market.id,
@@ -136,8 +154,8 @@ export class AnalyticsAgent extends BaseAgent {
 
       console.log('✅ Market analysis completed:', market.id, 'Prediction:', analysis.prediction);
       
-      // Emit analysis update
-      this.emit('analysisUpdated', marketAnalysis);
+      // Log analysis update
+      console.log('📊 Analysis updated for market:', marketAnalysis.marketId);
       
       return marketAnalysis;
 
@@ -227,13 +245,8 @@ export class AnalyticsAgent extends BaseAgent {
     `;
 
     try {
-      const response = await this.atp.analyze({
-        prompt,
-        model: 'gpt-4',
-        temperature: 0.3,
-      });
-
-      const analysis = JSON.parse(response.content);
+      const response = await this.agent.run(prompt);
+      const analysis = JSON.parse(response);
       
       return {
         category,
@@ -346,15 +359,10 @@ export class AnalyticsAgent extends BaseAgent {
     `;
 
     try {
-      const response = await this.atp.analyze({
-        prompt,
-        model: 'gpt-4',
-        temperature: 0.4,
-      });
-
-      const insights = JSON.parse(response.content);
+      const response = await this.agent.run(prompt);
+      const insights = JSON.parse(response);
       
-      this.emit('insightsGenerated', insights);
+      console.log('💡 Market insights generated:', insights.length);
       return insights;
 
     } catch (error) {
@@ -384,24 +392,30 @@ export class AnalyticsAgent extends BaseAgent {
   }
 
   /**
-   * Handle incoming events
+   * Analyze a market (public method for external calls)
    */
-  protected async handleEvent(eventType: string, data: any) {
-    switch (eventType) {
-      case 'analyzeMarket':
-        await this.analyzeMarket(data);
-        break;
-      case 'updatePredictions':
-        await this.updateMarketPredictions();
-        break;
-      case 'marketResolved':
-        await this.handleMarketResolution(data);
-        break;
-      case 'generateInsights':
-        await this.generateMarketInsights();
-        break;
-      default:
-        console.log(`📈 Analytics Agent: Unknown event type: ${eventType}`);
-    }
+  public async analyzeMarketExternal(market: PredictionMarket): Promise<MarketAnalysis> {
+    return await this.analyzeMarket(market);
+  }
+
+  /**
+   * Update all market predictions (public method)
+   */
+  public async updateMarketPredictionsExternal() {
+    await this.updateMarketPredictions();
+  }
+
+  /**
+   * Handle market resolution (public method)
+   */
+  public async handleMarketResolutionExternal(resolutionData: any) {
+    await this.handleMarketResolution(resolutionData);
+  }
+
+  /**
+   * Generate market insights (public method)
+   */
+  public async generateMarketInsightsExternal() {
+    return await this.generateMarketInsights();
   }
 }

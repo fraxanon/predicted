@@ -1,4 +1,4 @@
-import { BaseAgent, X402 } from "../../lib/mock-agents";
+import { AgentBuilder } from '@iqai/adk';
 import { ethers } from "ethers";
 
 export interface Bet {
@@ -24,31 +24,22 @@ export interface Payout {
 }
 
 /**
- * Betting Agent - Powered by IQ ADK + Coinbase x402
+ * Betting Agent - Powered by IQ ADK
  * 
  * Responsibilities:
- * - Handle user bet placement via x402 payments
+ * - Handle user bet placement and payments
  * - Manage bet execution on smart contracts
  * - Process payouts when markets resolve
  * - Track betting history and statistics
  */
-export class BettingAgent extends BaseAgent {
-  private x402: X402;
+export class BettingAgent {
+  private agent: any;
   private provider: ethers.JsonRpcProvider;
   private wallet: ethers.Wallet;
   private activeBets: Map<string, Bet>;
   private pendingPayouts: Map<string, Payout>;
 
   constructor() {
-    super('betting-agent');
-    
-    // Initialize Coinbase x402
-    this.x402 = new X402({
-      apiKey: process.env.COINBASE_X402_API_KEY,
-      secret: process.env.COINBASE_X402_SECRET,
-      environment: process.env.NODE_ENV === 'production' ? 'production' : 'sandbox',
-    });
-
     // Initialize blockchain connection
     this.provider = new ethers.JsonRpcProvider(
       process.env.FRAXTAL_RPC_URL || 'https://rpc.frax.com'
@@ -61,6 +52,33 @@ export class BettingAgent extends BaseAgent {
 
     this.activeBets = new Map();
     this.pendingPayouts = new Map();
+  }
+
+  async initialize() {
+    const { agent } = await AgentBuilder
+      .create('betting_agent')
+      .withModel('gpt-4o-mini')
+      .withDescription('Betting agent for Web3 prediction markets')
+      .withInstruction(`
+        You are a betting agent for Web3 prediction markets.
+        
+        Your responsibilities:
+        - Process user bet placements with payment validation
+        - Execute bets on Fraxtal L2 smart contracts
+        - Calculate bet shares and market odds
+        - Process payouts for winning bets
+        - Track betting statistics and user history
+        
+        Always ensure:
+        - Proper payment validation before bet execution
+        - Accurate share calculations based on market state
+        - Secure payout distribution to winners
+        - Comprehensive betting history tracking
+      `)
+      .build();
+    
+    this.agent = agent;
+    console.log('💰 Betting Agent initialized with ADK');
   }
 
   async run() {
@@ -115,20 +133,22 @@ export class BettingAgent extends BaseAgent {
   }
 
   /**
-   * Create a Coinbase x402 payment request
+   * Create a payment request for the bet
    */
   private async createPaymentRequest(bet: Bet) {
-    const paymentRequest = await this.x402.createPaymentRequest({
+    // Mock payment request - replace with actual payment processing
+    const paymentRequest = {
+      id: `payment-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       amount: bet.amount,
-      currency: 'USDC', // or frxUSD
+      currency: 'USDC',
       description: `Bet on prediction market: ${bet.marketId}`,
       metadata: {
         betId: bet.id,
         marketId: bet.marketId,
         position: bet.position,
       },
-      webhookUrl: `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/payment`,
-    });
+      status: 'pending',
+    };
 
     return paymentRequest;
   }
@@ -158,8 +178,8 @@ export class BettingAgent extends BaseAgent {
 
       console.log('🎯 Bet executed on-chain:', txHash);
 
-      // Emit bet confirmed event
-      this.emit('betConfirmed', bet);
+      // Log bet confirmation
+      console.log('✅ Bet confirmed:', bet.id);
 
     } catch (error) {
       console.error('❌ Failed to execute bet on-chain:', error);
@@ -266,8 +286,8 @@ export class BettingAgent extends BaseAgent {
       
       console.log('✅ Payout completed:', txHash);
       
-      // Emit payout completed event
-      this.emit('payoutCompleted', payout);
+      // Log payout completion
+      console.log('💸 Payout completed:', payout.id);
 
     } catch (error) {
       console.error('❌ Failed to execute payout:', error);
@@ -348,21 +368,23 @@ export class BettingAgent extends BaseAgent {
   }
 
   /**
-   * Handle incoming events
+   * Process a bet (public method for external calls)
    */
-  protected async handleEvent(eventType: string, data: any) {
-    switch (eventType) {
-      case 'processBet':
-        await this.processBet(data);
-        break;
-      case 'paymentSuccess':
-        await this.handlePaymentSuccess(data);
-        break;
-      case 'distributePayout':
-        await this.distributePayout(data);
-        break;
-      default:
-        console.log(`💰 Betting Agent: Unknown event type: ${eventType}`);
-    }
+  public async processBetExternal(betData: any): Promise<string> {
+    return await this.processBet(betData);
+  }
+
+  /**
+   * Handle payment success (public method)
+   */
+  public async handlePaymentSuccessExternal(paymentData: any) {
+    await this.handlePaymentSuccess(paymentData);
+  }
+
+  /**
+   * Distribute payouts (public method)
+   */
+  public async distributePayoutExternal(resolutionData: any) {
+    await this.distributePayout(resolutionData);
   }
 }

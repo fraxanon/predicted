@@ -1,4 +1,4 @@
-import { BaseAgent } from "../../lib/mock-agents";
+import { AgentBuilder } from '@iqai/adk';
 import { ethers } from "ethers";
 import { Web3Event } from "../oracle/OracleAgent";
 
@@ -27,14 +27,13 @@ export interface PredictionMarket {
  * - Manage market state and liquidity
  * - Handle market resolution
  */
-export class PredictionMarketAgent extends BaseAgent {
+export class PredictionMarketAgent {
+  private agent: any;
   private provider: ethers.JsonRpcProvider;
   private wallet: ethers.Wallet;
   private activeMarkets: Map<string, PredictionMarket>;
 
   constructor() {
-    super('prediction-market-agent');
-    
     // Initialize Fraxtal L2 connection
     this.provider = new ethers.JsonRpcProvider(
       process.env.FRAXTAL_RPC_URL || 'https://rpc.frax.com'
@@ -46,6 +45,33 @@ export class PredictionMarketAgent extends BaseAgent {
     );
 
     this.activeMarkets = new Map();
+  }
+
+  async initialize() {
+    const { agent } = await AgentBuilder
+      .create('prediction_market_agent')
+      .withModel('gpt-4o-mini')
+      .withDescription('Prediction market agent for Web3 events')
+      .withInstruction(`
+        You are a prediction market agent for Web3 events.
+        
+        Your responsibilities:
+        - Create new prediction markets from validated Web3 events
+        - Deploy smart contracts on Fraxtal L2 blockchain
+        - Manage market state, liquidity, and trading
+        - Handle market resolution based on oracle outcomes
+        - Track market performance and statistics
+        
+        Always ensure:
+        - Proper smart contract deployment and validation
+        - Accurate market state tracking
+        - Secure resolution process
+        - Comprehensive market data management
+      `)
+      .build();
+    
+    this.agent = agent;
+    console.log('📊 Prediction Market Agent initialized with ADK');
   }
 
   async run() {
@@ -90,8 +116,8 @@ export class PredictionMarketAgent extends BaseAgent {
 
       this.activeMarkets.set(market.id, market);
       
-      // Emit market created event
-      this.emit('marketCreated', market);
+      // Log market creation
+      console.log('🏗️ Market created successfully:', market.id);
       
       console.log('✅ Market created:', market.id);
       return market;
@@ -126,7 +152,6 @@ export class PredictionMarketAgent extends BaseAgent {
         // Check if market has ended
         if (new Date() > market.endDate && !market.resolved) {
           console.log('⏰ Market ended, awaiting resolution:', marketId);
-          this.emit('marketEnded', market);
         }
 
         // Update market data from blockchain
@@ -181,8 +206,8 @@ export class PredictionMarketAgent extends BaseAgent {
       market.resolved = true;
       market.outcome = resolutionData.outcome;
       
-      // Emit resolution event
-      this.emit('marketResolved', {
+      // Log market resolution
+      console.log('✅ Market resolved:', {
         marketId: market.id,
         outcome: resolutionData.outcome,
         totalPool: market.totalPool,
@@ -220,21 +245,16 @@ export class PredictionMarketAgent extends BaseAgent {
   }
 
   /**
-   * Handle incoming events
+   * Create a market (public method for external calls)
    */
-  protected async handleEvent(eventType: string, data: any) {
-    switch (eventType) {
-      case 'createMarket':
-        await this.createMarket(data);
-        break;
-      case 'resolveMarket':
-        await this.resolveMarket(data);
-        break;
-      case 'marketEnded':
-        console.log('⏰ Market ended:', data.id);
-        break;
-      default:
-        console.log(`📊 Prediction Market Agent: Unknown event type: ${eventType}`);
-    }
+  public async createMarketExternal(eventData: Web3Event): Promise<PredictionMarket> {
+    return await this.createMarket(eventData);
+  }
+
+  /**
+   * Resolve a market (public method)
+   */
+  public async resolveMarketExternal(resolutionData: any) {
+    await this.resolveMarket(resolutionData);
   }
 }

@@ -3,13 +3,14 @@ import { OracleAgent } from "./oracle/OracleAgent";
 import { PredictionMarketAgent } from "./prediction/PredictionMarketAgent";
 import { BettingAgent } from "./betting/BettingAgent";
 import { AnalyticsAgent } from "./analytics/AnalyticsAgent";
+import { IQPredictADKSystem } from "./index-adk";
 import dotenv from "dotenv";
 
 // Load environment variables
 dotenv.config();
 
 /**
- * IQ Predict Multi-Agent System
+ * IQ Predict Multi-Agent System (Legacy)
  * 
  * Orchestrates four specialized agents:
  * 1. Oracle Agent - Scrapes and validates Web3 news
@@ -18,103 +19,82 @@ dotenv.config();
  * 4. Analytics Agent - Provides AI predictions
  */
 class IQPredictSystem {
-  private agentSystem: AgentSystem;
+  private agentSystem?: AgentSystem;
+  private useADK: boolean;
+  private adkSystem?: IQPredictADKSystem;
 
-  constructor() {
-    // Initialize the multi-agent system
-    this.agentSystem = new AgentSystem({
-      agents: [
-        new OracleAgent(),
-        new PredictionMarketAgent(),
-        new BettingAgent(),
-        new AnalyticsAgent(),
-      ],
-      config: {
-        apiKey: process.env.IQ_ADK_API_KEY,
-        environment: process.env.NODE_ENV || 'development',
-      }
-    });
-
-    this.setupEventHandlers();
+  constructor(useADK: boolean = true) {
+    this.useADK = useADK;
+    
+    if (useADK) {
+      // Use the new ADK system
+      this.adkSystem = new IQPredictADKSystem();
+    } else {
+      // Legacy system is no longer supported since agents are converted to ADK
+      console.warn('⚠️  Legacy system is deprecated. All agents now use ADK framework.');
+      console.log('🔄 Falling back to ADK system...');
+      this.useADK = true;
+      this.adkSystem = new IQPredictADKSystem();
+    }
   }
 
   /**
-   * Set up inter-agent communication
+   * Set up inter-agent communication (legacy - no longer used)
    */
   private setupEventHandlers() {
-    // Oracle Agent → Prediction Market Agent
-    this.agentSystem.on('newWeb3Event', (eventData: any) => {
-      console.log('🔮 New Web3 event detected:', eventData.title);
-      this.agentSystem.emit('createMarket', eventData);
-    });
-
-    // Prediction Market Agent → Analytics Agent
-    this.agentSystem.on('marketCreated', (marketData: any) => {
-      console.log('📊 New market created:', marketData.id);
-      this.agentSystem.emit('analyzeMarket', marketData);
-    });
-
-    // User bet → Betting Agent
-    this.agentSystem.on('userBet', (betData: any) => {
-      console.log('💰 New bet placed:', betData.amount);
-      this.agentSystem.emit('processBet', betData);
-    });
-
-    // Oracle resolution → Betting Agent
-    this.agentSystem.on('eventResolved', (resolutionData: any) => {
-      console.log('✅ Event resolved:', resolutionData.outcome);
-      this.agentSystem.emit('distributePayout', resolutionData);
-    });
+    // This method is deprecated as all agents now use ADK
+    console.log('⚠️  Legacy event handlers are deprecated');
   }
 
   /**
    * Start the agent system
    */
   async start() {
-    console.log('🚀 Starting IQ Predict Agent System...');
-    
-    try {
-      await this.agentSystem.start();
-      console.log('✅ All agents initialized successfully');
-      
-      // Start periodic tasks
-      this.startPeriodicTasks();
-      
-    } catch (error) {
-      console.error('❌ Failed to start agent system:', error);
-      process.exit(1);
+    if (this.adkSystem) {
+      console.log('🚀 Starting IQ Predict ADK Agent System...');
+      await this.adkSystem.start();
+    } else {
+      throw new Error('No agent system available');
     }
   }
 
   /**
-   * Start periodic background tasks
+   * Start periodic background tasks (legacy - now handled by ADK system)
    */
   private startPeriodicTasks() {
-    // Oracle checks for new events every 5 minutes
-    setInterval(() => {
-      this.agentSystem.emit('checkForEvents');
-    }, 5 * 60 * 1000);
-
-    // Analytics updates predictions every 10 minutes
-    setInterval(() => {
-      this.agentSystem.emit('updatePredictions');
-    }, 10 * 60 * 1000);
-
-    console.log('⏰ Periodic tasks started');
+    console.log('⚠️  Legacy periodic tasks are deprecated - handled by ADK system');
   }
 
   /**
    * Graceful shutdown
    */
   async stop() {
-    console.log('🛑 Stopping IQ Predict Agent System...');
-    await this.agentSystem.stop();
-    console.log('✅ Agent system stopped');
+    if (this.adkSystem) {
+      await this.adkSystem.stop();
+    }
+  }
+
+  /**
+   * Get system status
+   */
+  getStatus() {
+    if (this.adkSystem) {
+      return this.adkSystem.getSystemStatus();
+    } else {
+      return {
+        system: 'error',
+        message: 'No agent system available',
+        timestamp: new Date(),
+      };
+    }
   }
 }
 
 // Initialize and start the system
-const iqPredict = new IQPredictSystem();
+// All agents now use ADK framework
+const iqPredict = new IQPredictSystem(true);
+
+console.log('🎆 Using ADK Agent System');
 
 // Handle graceful shutdown
 process.on('SIGINT', async () => {
@@ -131,3 +111,4 @@ process.on('SIGTERM', async () => {
 iqPredict.start().catch(console.error);
 
 export default iqPredict;
+export { IQPredictSystem };
