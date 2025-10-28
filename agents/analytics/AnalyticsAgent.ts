@@ -1,5 +1,4 @@
-import { AgentBuilder } from '@iqai/adk';
-import { ATP } from "../../lib/mock-agents";
+import { BaseAgent, ATP } from "../../lib/mock-agents";
 import { PredictionMarket } from "../prediction/PredictionMarketAgent";
 
 export interface MarketAnalysis {
@@ -21,7 +20,7 @@ export interface TrendAnalysis {
 }
 
 /**
- * Analytics Agent - Powered by IQ ADK + ATP
+ * Analytics Agent - Powered by IQ ATP
  * 
  * Responsibilities:
  * - Analyze prediction markets using AI
@@ -29,10 +28,7 @@ export interface TrendAnalysis {
  * - Track market trends and patterns
  * - Generate insights for users
  */
-export class AnalyticsAgent {
-  private agent: any;
-  private runner: any;
-  private session: any;
+export class AnalyticsAgent extends BaseAgent {
   private atp: ATP;
   private marketAnalyses: Map<string, MarketAnalysis>;
   private trendAnalyses: Map<string, TrendAnalysis>;
@@ -45,6 +41,7 @@ export class AnalyticsAgent {
   }>;
 
   constructor() {
+    super('analytics-agent');
     
     this.atp = new ATP({
       apiKey: process.env.IQ_ATP_API_KEY,
@@ -53,35 +50,6 @@ export class AnalyticsAgent {
     this.marketAnalyses = new Map();
     this.trendAnalyses = new Map();
     this.predictionHistory = [];
-  }
-
-  async initialize() {
-    const { agent, runner, session } = await AgentBuilder
-      .create('analytics_agent')
-      .withModel('gpt-4o-mini')
-      .withDescription('AI agent that analyzes prediction markets and provides insights using ATP')
-      .withInstruction(`
-        You are an Analytics Agent specialized in prediction market analysis and insights.
-        
-        Your responsibilities:
-        1. Analyze prediction markets using AI
-        2. Provide outcome predictions and confidence scores
-        3. Track market trends and patterns
-        4. Generate insights for users
-        
-        Focus on:
-        - Accurate market analysis using ATP
-        - Data-driven predictions and insights
-        - Trend identification across categories
-        - User-friendly analytics dashboards
-      `)
-      .build();
-
-    this.agent = agent;
-    this.runner = runner;
-    this.session = session;
-    
-    return { agent, runner, session };
   }
 
   async run() {
@@ -168,8 +136,8 @@ export class AnalyticsAgent {
 
       console.log('✅ Market analysis completed:', market.id, 'Prediction:', analysis.prediction);
       
-      // Log analysis update
-      console.log('📊 Analysis updated event:', marketAnalysis.marketId);
+      // Emit analysis update
+      this.emit('analysisUpdated', marketAnalysis);
       
       return marketAnalysis;
 
@@ -386,7 +354,7 @@ export class AnalyticsAgent {
 
       const insights = JSON.parse(response.content);
       
-      console.log('💡 Insights generated event:', insights.length, 'insights');
+      this.emit('insightsGenerated', insights);
       return insights;
 
     } catch (error) {
@@ -416,30 +384,24 @@ export class AnalyticsAgent {
   }
 
   /**
-   * Analyze market from external request
+   * Handle incoming events
    */
-  public async analyzeMarketFromEvent(market: PredictionMarket): Promise<MarketAnalysis> {
-    return await this.analyzeMarket(market);
-  }
-
-  /**
-   * Update predictions from external request
-   */
-  public async updatePredictionsFromEvent() {
-    return await this.updateMarketPredictions();
-  }
-
-  /**
-   * Handle market resolution from external request
-   */
-  public async handleMarketResolutionFromEvent(resolutionData: any) {
-    return await this.handleMarketResolution(resolutionData);
-  }
-
-  /**
-   * Generate insights from external request
-   */
-  public async generateInsightsFromEvent() {
-    return await this.generateMarketInsights();
+  protected async handleEvent(eventType: string, data: any) {
+    switch (eventType) {
+      case 'analyzeMarket':
+        await this.analyzeMarket(data);
+        break;
+      case 'updatePredictions':
+        await this.updateMarketPredictions();
+        break;
+      case 'marketResolved':
+        await this.handleMarketResolution(data);
+        break;
+      case 'generateInsights':
+        await this.generateMarketInsights();
+        break;
+      default:
+        console.log(`📈 Analytics Agent: Unknown event type: ${eventType}`);
+    }
   }
 }

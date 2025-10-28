@@ -1,5 +1,7 @@
-// Twitter Market Scout Agent using @iqai/adk
-// This is the main ADK-based implementation for the hackathon
+// Temporarily disabled due to ADK compatibility issues
+// This file will be re-enabled once ADK integration is properly configured
+
+/*
 import { AgentBuilder } from '@iqai/adk';
 import { TwitterSearchTool, TwitterSearchResult } from './tools/TwitterSearchTool';
 import { MarketAnalysisTool, MarketAnalysis } from './tools/MarketAnalysisTool';
@@ -221,3 +223,4 @@ ${index + 1}. ${rec.question}
     return output;
   }
 }
+*/

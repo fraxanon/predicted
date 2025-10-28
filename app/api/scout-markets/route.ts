@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { TwitterMarketScout } from '../../../agents/TwitterMarketScout';
+import { TwitterMarketScoutSimple } from '../../../agents/TwitterMarketScoutSimple';
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     console.log('🚀 Initializing Twitter Market Scout...');
     
     // Initialize the scout agent
-    const scout = new TwitterMarketScout();
+    const scout = new TwitterMarketScoutSimple();
     await scout.initialize();
 
     console.log('🔍 Starting market scouting process...');
@@ -31,8 +31,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: report,
-      formattedReport: scout.getFormattedReport(report),
-      message: 'Using ADK-powered TwitterMarketScout agent'
+      formattedReport: scout.getFormattedReport(report)
     });
 
   } catch (error) {
@@ -61,7 +60,7 @@ export async function GET(request: NextRequest) {
     console.log(`🎯 Analyzing specific topic: "${topic}"`);
     
     // Initialize the scout agent
-    const scout = new TwitterMarketScout();
+    const scout = new TwitterMarketScoutSimple();
     await scout.initialize();
 
     // Analyze specific topic
