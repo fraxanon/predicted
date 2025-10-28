@@ -28,7 +28,7 @@ A decentralized prediction market platform built for Fraxtal L2, featuring smart
 
 ### Live Demo 🌐
 - **Production App**: https://predicted.web3 (Custom Web3 Domain)
-- **Fallback URL**: https://predicted-8tlwgqxtm-eros-6531s-projects.vercel.app
+- **Fallback URL**: predicted-rose.vercel.app
 - **Dashboard Interface**: Original dashboard-style landing page with markets
 - **Platform**: Vercel with native Next.js support and serverless functions
 - **Full-Stack Features**: API routes, agent integration, serverless functions
