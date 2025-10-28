@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { TwitterMarketScoutSimple } from '../../../agents/TwitterMarketScoutSimple';
+import { TwitterMarketScout } from '../../../agents/TwitterMarketScout';
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     console.log('🚀 Initializing Twitter Market Scout...');
     
     // Initialize the scout agent
-    const scout = new TwitterMarketScoutSimple();
+    const scout = new TwitterMarketScout();
     await scout.initialize();
 
     console.log('🔍 Starting market scouting process...');
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
     console.log(`🎯 Analyzing specific topic: "${topic}"`);
     
     // Initialize the scout agent
-    const scout = new TwitterMarketScoutSimple();
+    const scout = new TwitterMarketScout();
     await scout.initialize();
 
     // Analyze specific topic

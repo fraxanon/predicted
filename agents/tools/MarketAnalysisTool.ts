@@ -1,31 +1,5 @@
 import { TwitterSearchResult } from './TwitterSearchTool';
-
-// BaseTool interface compatible with ADK
-interface ToolConfig {
-  name: string;
-  description: string;
-}
-
-abstract class BaseTool {
-  name: string;
-  description: string;
-  isLongRunning: boolean = false;
-  shouldRetryOnFailure: boolean = true;
-  maxRetryAttempts: number = 3;
-  baseRetryDelay: number = 1000;
-  maxRetryDelay: number = 10000;
-  retryBackoffFactor: number = 2;
-  timeout: number = 30000;
-  requiresConfirmation: boolean = false;
-  confirmationMessage?: string;
-  
-  constructor(config: ToolConfig) {
-    this.name = config.name;
-    this.description = config.description;
-  }
-  
-  abstract execute(params: any): Promise<any>;
-}
+import { BaseTool } from '@iqai/adk';
 
 export interface MarketAnalysis {
   marketId: string;
@@ -41,8 +15,8 @@ export interface MarketAnalysis {
 }
 
 export class MarketAnalysisTool extends BaseTool {
-  constructor(config?: ToolConfig) {
-    super(config || {
+  constructor() {
+    super({
       name: 'analyze_market_potential',
       description: 'Analyze Twitter content to determine prediction market viability and generate market questions'
     });
